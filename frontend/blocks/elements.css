@@ -1,0 +1,104 @@
+.cards{
+  margin: 0 auto;
+  padding: 0;
+}
+.cards__list {
+  padding: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  column-gap: 1.93%;
+  row-gap: 20px;
+  padding-top: 50px;
+  margin: 0 auto;
+  justify-content: center;
+  min-height: 300px;
+  height: auto;
+}
+.card {
+  border-radius: 10px;
+  background-color: white;
+  border: solid black 1px;
+  width: 282px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  overflow: hidden;
+}
+.card__image {
+  
+  width: 282px;
+  height: 282px;
+
+  background-position: center;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+  object-fit: initial;
+}
+
+.card__delete-button {
+  padding: 0;
+  position: absolute;
+  top: 18px;
+  right: 15px;
+  background-repeat: no-repeat;
+  border: 0;
+  cursor: pointer;
+  background-color: transparent;
+  background-image: url(../src/images/Trash.svg);
+  background-size: cover;
+  background-position: center;
+  width: 18px;
+  height: 19.3px;
+}
+.card__delete-button:hover{
+  opacity: 60%;
+}
+.card__description {
+  padding: 25px 15px 31px 21px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: end;
+}
+.card__title {
+  margin: 0;
+  font-family: Inter;
+  font-weight: 900;
+  font-size: 24px;
+  line-height: 29.05px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  width: 92.55%;
+}
+.card__like-button {
+  width: 21px;
+  height: 19px;
+  position: relative;
+  bottom: 5px;
+  background-image: url(../src/images/heart-normal.png);
+  background-size: cover;
+  background-repeat: no-repeat;
+  border: 0;
+  background-color: #fff;
+  cursor: pointer;
+}
+.card__like-button:hover {
+  opacity: 0.5;
+}
+.card__heart_active {
+  background-image: url(../src/images/heart-active.png);
+  opacity: 1;
+}
+@media screen and (max-width: 880px) {
+  .cards__list {
+    grid-template-columns: auto auto;
+  }
+}
+@media screen and (max-width: 600px) {
+  .cards__list {
+    grid-template-columns: auto;
+    padding: 36px 0px 0px;
+  }
+}

@@ -1,0 +1,209 @@
+.profile {
+  color: #fff;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0;
+  padding-top: 40px;
+  font-family: Inter;
+}
+.profile__info {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 30px;
+}
+.profile__avatar-container {
+  position: relative;
+  display: inline-block;
+  width: 120px;
+  height: 120px;
+}
+
+.profile__avatar {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background-size: cover;
+  background-position: center;
+  background-image: none;
+}
+
+.profile__avatar-button {
+  width: 120px;
+  height: 120px;
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  border-radius: 50%;
+  background-image: url(../src/images/edit-avatar-button.png);
+  
+}
+.profile__avatar-button {
+  opacity: 0;
+}
+
+.profile__avatar-button:hover {
+  opacity: 1;
+  cursor: pointer;
+}
+
+
+.profile__info-text {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.profile__name {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 30px;
+}
+.profile__name-text {
+  font-family: Inter,sans-serif;
+  font-weight: 500;
+  font-size: 42px;
+  line-height: 39px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  margin: 0;
+}
+.profile__name-edit-button {
+  width: 24px;
+  height: 24px;
+  background-color: black;
+  border: solid 1px #fff;
+  padding: 7px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.profile__name-edit-button:hover {
+  opacity: 60%;
+  cursor: pointer;
+}
+.profile__name-edit-button-image {
+  background-image: url(../src/images/edit-button.png);
+  width: 10px;
+  height: 10px;
+  cursor: pointer;
+}
+.profile__description {
+  font-family: Inter,sans-serif;
+  font-weight: 400;
+  font-size: 18px;
+  line-height: 21.78px;
+  margin: 0;
+}
+
+.profile__add-button {
+  height: 50px;
+  width: 17.05%;
+  background-color: black;
+  border: solid #fff 2px;
+  background-position: center;
+  background-size: 14.67%;
+  background-repeat: no-repeat;
+  background-image: url(../src/images/add-button.png);
+}
+.profile__add-button:hover {
+  opacity: 60%;
+  cursor: pointer;
+}
+
+@media screen and (max-width: 768px) {
+  .profile {
+    margin: 0 auto;
+    padding: 42px 50px 0;
+    flex-direction: column;
+    gap: 36px;
+    width: calc(100% - 100px);
+  }
+  .profile__info {
+    flex-direction: column;
+  }
+  .profile__info-text {
+    align-items: center;
+    gap: 14px;
+  }
+  .profile__name {
+    gap: 20px;
+  }
+  .profile__name-text {
+    width: 90%;
+    font-size: 22px;
+    line-height: 26.63px;
+  }
+  .profile__name-edit-button {
+    padding: 5.25px;
+    width: 21px;
+    height: 21px;
+    position: relative;
+    bottom: 1.25px;
+  }
+  .profile__name-edit-button-image {
+    width: 7.5px;
+    height: 7.5px;
+  }
+  .profile__description {
+    font-family: Inter,sans-serif;
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 16.94px;
+    letter-spacing: 0%;
+    text-align: center;
+  }
+  .profile__add-button {
+    width: 60%;
+    background-size: 16px;
+    min-width: 205px;
+  }
+}
+
+@media screen and (max-width: 320px) {
+  .profile {
+    padding: 42px 19px 0px;
+    flex-direction: column;
+    gap: 36px;
+  }
+  .profile__info {
+    flex-direction: column;
+  }
+  .profile__info-text {
+    align-items: center;
+    gap: 14px;
+  }
+  .profile__name {
+    gap: 10px;
+  }
+  .profile__name-text {
+    font-family: Inter,sans-serif;
+    font-weight: 500;
+    font-size: 22px;
+    line-height: 26.63px;
+    letter-spacing: 0%;
+    text-align: center;
+  }
+  .profile__name-edit-button {
+    padding: 5.25px;
+    width: 18px;
+    height: 18px;
+    position: relative;
+    bottom: 1.25px;
+  }
+  .profile__description {
+    font-family: Inter,sans-serif;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 16.94px;
+    letter-spacing: 0%;
+    text-align: center;
+  }
+  .profile__add-button {
+    width: 100%;
+    background-size: 5.67%;
+  }
+}
