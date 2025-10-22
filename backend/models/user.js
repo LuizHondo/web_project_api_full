@@ -8,16 +8,19 @@ const userSchema = new mongoose.Schema({
     type:String,
     minlength:2,
     maxlength:30,
-    required:true
+    required:true,
+    default: 'Jacques Cousteau'
   },
   about:{
     type:String,
     minlength:2,
     maxlength:30,
-    required:true
+    required:true,
+    default: 'Explorer'
   },
   avatar:{
     type:String,
+    default: 'https://pictures.s3.yandex.net/resources/avatar_1604080799.jpg',
     validate:{
       validator: (v) => urlRegex.test(v),
       message: "Invalid avatar URL"
@@ -25,7 +28,7 @@ const userSchema = new mongoose.Schema({
   },
   email:{
     type:String,
-    require: true,
+    required: true,
     unique:true,
     validate:{
       validator: (email) => validator.isEmail(email)

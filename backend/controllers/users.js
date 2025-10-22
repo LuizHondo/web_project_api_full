@@ -1,4 +1,5 @@
 const User = require('../models/user');
+const bcrypt = require('bcryptjs')
 
 module.exports.getAllUsers = (req, res) => {
   User.find({})
@@ -23,11 +24,15 @@ module.exports.getUserById = (req, res) => {
 };
 
 
-module.exports.createUser = (req, res) => {
-  const { name, about, avatar } = req.body;
-
-  User.create({ name, about, avatar })
-    .then((newUser) => res.status(201).json(newUser))
+module.exports.createUser = (req, res, next) => {
+  const { name, about, avatar, email, password } = req.body;
+  bcrypt.hash(password, 10).then((hash)=>
+    User.create({ name, about, avatar, email, password: hash})
+  ) .then((newUser) =>{
+      const userWithoutPassword = {_id: newUser._id,name: newUser.name,about: newUser.about,avatar: newUser.avatar,email: newUser.email};
+      res.status(201).json(userWithoutPassword)
+    }
+  )
     .catch((err) => {
       if (err.name === 'ValidationError') {
         return res.status(400).json({ message: 'Dados inválidos', error: err.message })
