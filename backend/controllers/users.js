@@ -1,28 +1,56 @@
 const User = require('../models/user');
 const bcrypt = require('bcryptjs')
+const jwt = require('jsonwebtoken')
+
+module.exports.login = (req, res) => {
+  const { email, password } = req.body;
+
+  User.findOne({ email })
+    .then((user) => {
+      if (!user) {
+        return Promise.reject(new Error('Invalid email or password'));
+      }
+
+      return bcrypt.compare(password, user.password)
+        .then((matched) => {
+          if (!matched) {
+            return Promise.reject(new Error('Invalid email or password'));
+          }
+
+          const token = jwt.sign(
+            { _id: user._id },
+            'super-strong-secret',
+            { expiresIn: '7d' }
+          );
+          res.send({ token });
+        });
+    })
+    .catch((err) => {
+      res.status(401).json({ message: err.message });
+    });
+};
 
 module.exports.getAllUsers = (req, res) => {
   User.find({})
     .then((users) => res.json(users))
-    .catch((err) => res.status(500).json({ message: 'Erro interno no servidor', error: err.message }));
+    .catch((err) => res.status(500).json({ message: 'Internal server error', error: err.message }));
 };
 
 module.exports.getUserById = (req, res) => {
   User.findById(req.params.id)
     .orFail(() => {
-      const error = new Error('Usuário não encontrado');
+      const error = new Error('User not found');
       error.statusCode = 404;
       throw error;
     })
     .then((user) => res.json(user))
     .catch((err) => {
       if (err.name === 'CastError') {
-        return res.status(400).json({ message: 'ID inválido' })
+        return res.status(400).json({ message: 'Invalid ID' })
       }
       return res.status(err.statusCode || 500).json({ message: err.message });
     });
 };
-
 
 module.exports.createUser = (req, res, next) => {
   const { name, about, avatar, email, password } = req.body;
@@ -35,9 +63,9 @@ module.exports.createUser = (req, res, next) => {
   )
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        return res.status(400).json({ message: 'Dados inválidos', error: err.message })
+        return res.status(400).json({ message: 'Invalid data', error: err.message })
       };
-      return res.status(500).json({ message: 'Erro interno no servidor', error: err.message });
+      return res.status(500).json({ message: 'Internal server error', error: err.message });
     });
 };
 
@@ -47,33 +75,32 @@ module.exports.updateUser = (req, res) => {
   User.findByIdAndUpdate(req.body._id,{ name, about })
     .then((updatedUser) => {
       if(!updatedUser){
-        return res.status(404).json({message:'Usuário não encontrado'})
+        return res.status(404).json({message:'User not found'})
       }
       return res.status(200).json(updatedUser)
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        return res.status(400).json({ message: 'Dados inválidos', error: err.message });
+        return res.status(400).json({ message: 'Invalid data', error: err.message });
       }
-      return res.status(500).json({ message: 'Erro interno no servidor', error: err.message });
+      return res.status(500).json({ message: 'Internal server error', error: err.message });
     });
 };
+
 module.exports.updateUserAvatar = (req, res) => {
   const { avatar } = req.body;
 
   User.findByIdAndUpdate(req.body._id,{ avatar })
     .then((updatedUserAvatar) => {
       if(!updatedUserAvatar){
-        return res.status(404).json({message:'Usuário não encontrado'})
+        return res.status(404).json({message:'User not found'})
       }
       return res.status(200).json(updatedUser)
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        return res.status(400).json({ message: 'Dados inválidos', error: err.message });
+        return res.status(400).json({ message: 'Invalid data', error: err.message });
       }
-      return res.status(500).json({ message: 'Erro interno no servidor', error: err.message });
+      return res.status(500).json({ message: 'Internal server error', error: err.message });
     });
 };
-
-
