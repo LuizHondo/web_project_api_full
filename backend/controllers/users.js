@@ -35,7 +35,21 @@ module.exports.getAllUsers = (req, res) => {
     .then((users) => res.json(users))
     .catch((err) => res.status(500).json({ message: 'Internal server error', error: err.message }));
 };
-
+module.exports.getCurrentUser = (req, res) => {
+  User.findById(req.params._id)
+    .orFail(() => {
+      const error = new Error('User not found');
+      error.statusCode = 404;
+      throw error;
+    })
+    .then((user) => res.json(user))
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        return res.status(400).json({ message: 'Invalid ID' })
+      }
+      return res.status(err.statusCode || 500).json({ message: err.message });
+    });
+};
 module.exports.getUserById = (req, res) => {
   User.findById(req.params.id)
     .orFail(() => {
