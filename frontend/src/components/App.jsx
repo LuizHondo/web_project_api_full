@@ -12,7 +12,6 @@ import * as auth from "../utils/auth.js";
 import CurrentUserContext from "../contexts/CurrentUserContext.js";
 
 export default function App() {
-  // Estados principais
   const [currentUser, setCurrentUser] = useState({});
   const [popup, setPopup] = useState(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -20,8 +19,6 @@ export default function App() {
   const [email, setEmail] = useState('');
   const [isInfoTooltipOpen, setIsInfoTooltipOpen] = useState(false);
   const [tooltipStatus, setTooltipStatus] = useState('');
-  console.log(validator)
-  // Verificar token ao carregar a aplicação
   useEffect(() => {
     const token = localStorage.getItem('jwt');
     if (token) {
@@ -39,7 +36,6 @@ export default function App() {
     }
   }, []);
 
-  // Carregar dados do usuário quando logado
   useEffect(() => {
     if (isLoggedIn) {
       Promise.all([api.getUserInfo(), api.getInitialCards()])
@@ -51,7 +47,6 @@ export default function App() {
     }
   }, [isLoggedIn]);
 
-  // Funções de popup
   function handleOpenPopup(popup) {
     setPopup(popup);
   }
@@ -60,7 +55,6 @@ export default function App() {
     setPopup(null);
   }
 
-  // Funções de autenticação
   const handleLogin = (email, password) => {
     return auth.authorize(email, password)
       .then((data) => {
@@ -99,7 +93,6 @@ export default function App() {
     setCards([]);
   };
 
-  // Funções de perfil
   const handleUpdateUser = (data) => {
     return api.updateProfile(data)
       .then((newData) => {
@@ -118,7 +111,6 @@ export default function App() {
       .catch((err) => console.error(err));
   };
 
-  // Funções de cartões
   const handleCardLike = (card) => {
     const isLiked = card.isLiked;
     

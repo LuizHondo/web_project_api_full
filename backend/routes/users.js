@@ -10,7 +10,7 @@ router.post('/signup',usersController.createUser);
 router.use(auth);
 
 router.get('/', usersController.getAllUsers);
-// router.get('/me', usersController.);
+router.get('/me', usersController.getCurrentUser);
 router.get('/:id', usersController.getUserById);
 router.patch('/me', usersController.updateUser);
 router.patch('/me/avatar', usersController.updateUserAvatar);
