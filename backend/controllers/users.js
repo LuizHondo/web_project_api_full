@@ -1,11 +1,11 @@
 const User = require('../models/user');
-const bcrypt = require('bcryptjs')
-const jwt = require('jsonwebtoken')
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 
 module.exports.login = (req, res) => {
   const { email, password } = req.body;
 
-  User.findOne({ email })
+  User.findOne({ email }).select('+password')
     .then((user) => {
       if (!user) {
         return Promise.reject(new Error('Invalid email or password'));
@@ -17,11 +17,17 @@ module.exports.login = (req, res) => {
             return Promise.reject(new Error('Invalid email or password'));
           }
 
+          // Usar variável de ambiente para JWT_SECRET
+          const secretKey = process.env.NODE_ENV === 'production'
+            ? process.env.JWT_SECRET
+            : 'dev-secret-key';
+
           const token = jwt.sign(
             { _id: user._id },
-            'super-strong-secret',
+            secretKey,
             { expiresIn: '7d' }
           );
+
           res.send({ token });
         });
     })
@@ -36,7 +42,7 @@ module.exports.getAllUsers = (req, res) => {
     .catch((err) => res.status(500).json({ message: 'Internal server error', error: err.message }));
 };
 module.exports.getCurrentUser = (req, res) => {
-  User.findById(req.params._id)
+  User.findById(req.user._id)
     .orFail(() => {
       const error = new Error('User not found');
       error.statusCode = 404;
@@ -104,7 +110,7 @@ module.exports.updateUser = (req, res) => {
 module.exports.updateUserAvatar = (req, res) => {
   const { avatar } = req.body;
 
-  User.findByIdAndUpdate(req.body._id,{ avatar })
+  User.findByIdAndUpdate(req.user._id,{ avatar },{ new: true, runValidators: true })
     .then((updatedUserAvatar) => {
       if(!updatedUserAvatar){
         return res.status(404).json({message:'User not found'})

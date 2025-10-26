@@ -6,6 +6,10 @@ module.exports.getAllCards = (req, res) => {
     .catch((err) => res.status(500).json({ message: 'Erro interno no servidor', error: err.message }));
 };
 
+module.exports.getCards = (req, res) => {
+  Card.find({ owner: req.user._id })  // Filtra por usuário!
+    .then(cards => res.json(cards));
+};
 module.exports.getCardById = (req, res) => {
   Card.findById(req.params.id)
     .orFail(() => {
