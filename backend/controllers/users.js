@@ -86,7 +86,7 @@ module.exports.createUser = (req, res, next) => {
 module.exports.updateUser = (req, res) => {
   const { name, about } = req.body;
 
-  User.findByIdAndUpdate(req.body._id,{ name, about })
+  User.findByIdAndUpdate(req.user._id,{ name, about },{new: true, runValidators: true})
     .then((updatedUser) => {
       if(!updatedUser){
         return res.status(404).json({message:'User not found'})
@@ -109,7 +109,7 @@ module.exports.updateUserAvatar = (req, res) => {
       if(!updatedUserAvatar){
         return res.status(404).json({message:'User not found'})
       }
-      return res.status(200).json(updatedUser)
+      return res.status(200).json(updatedUserAvatar)
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {

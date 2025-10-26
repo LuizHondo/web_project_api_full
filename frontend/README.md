@@ -132,7 +132,7 @@ useEffect(() => {
   const token = localStorage.getItem("jwt");
   if (token) {
     auth
-      .authorize(token)
+      .checkToken(token)
       .then((res) => {
         if (res) {
           setEmail(res.data.email);

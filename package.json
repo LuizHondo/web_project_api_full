@@ -2,7 +2,10 @@
   "name": "my-monorepo",
   "private": true,
   "version": "1.0.0",
-  "workspaces": ["frontend", "backend"],
+  "workspaces": [
+    "frontend",
+    "backend"
+  ],
   "scripts": {
     "dev": "concurrently -n front,back -c auto \"npm:dev -w frontend\" \"npm:dev -w backend\"",
     "dev:front": "npm run dev -w frontend",
@@ -13,5 +16,9 @@
   },
   "devDependencies": {
     "concurrently": "^9.0.0"
+  },
+  "dependencies": {
+    "celebrate": "^15.0.3",
+    "cors": "^2.8.5"
   }
 }

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, useNavigate, Navigate } from 'react-router-dom';
 import Footer from "./Footer/Footer.jsx";
 import Header from "./Header/Header.jsx";
 import Main from "./Main/Main.jsx";
@@ -11,6 +11,7 @@ import api from "../utils/api.js";
 import * as auth from "../utils/auth.js";
 import CurrentUserContext from "../contexts/CurrentUserContext.js";
 
+
 export default function App() {
   const [currentUser, setCurrentUser] = useState({});
   const [popup, setPopup] = useState(null);
@@ -19,10 +20,11 @@ export default function App() {
   const [email, setEmail] = useState('');
   const [isInfoTooltipOpen, setIsInfoTooltipOpen] = useState(false);
   const [tooltipStatus, setTooltipStatus] = useState('');
+ // Verificação do token no carregamento da aplicação
   useEffect(() => {
     const token = localStorage.getItem('jwt');
     if (token) {
-      auth.authorize(token)
+      auth.checkToken(token)
         .then((res) => {
           if (res) {
             setEmail(res.data.email);
@@ -31,11 +33,12 @@ export default function App() {
         })
         .catch((err) => {
           console.error('Token inválido:', err);
-          localStorage.removeItem('jwt');
+          // localStorage.removeItem('jwt');
         });
     }
+    else{console.log('No token found');}
   }, []);
-
+  
   useEffect(() => {
     if (isLoggedIn) {
       Promise.all([api.getUserInfo(), api.getInitialCards()])
