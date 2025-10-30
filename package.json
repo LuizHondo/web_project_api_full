@@ -12,10 +12,12 @@
     "dev:back": "npm run dev -w backend",
     "build": "npm run build -w frontend",
     "lint": "npm run lint -w frontend && npm run lint -w backend",
-    "start": "npm run start -w backend"
+    "start": "npm run start -w backend",
+    "test": "jest"
   },
   "devDependencies": {
-    "concurrently": "^9.0.0"
+    "concurrently": "^9.0.0",
+    "jest": "^30.2.0"
   },
   "dependencies": {
     "celebrate": "^15.0.3",

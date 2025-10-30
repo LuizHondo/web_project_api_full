@@ -9,8 +9,6 @@ const auth = require('./middleware/auth');
 const app = express();
 const PORT = 3001;
 
-
-
 app.use(express.json());
 
 app.use(cors());
@@ -29,6 +27,14 @@ app.use(auth);
 // Rotas protegidas
 app.use('/users', usersRouter);
 app.use('/cards', cardsRouter);
+
+app.use((err, req, res, next) => {
+  const statusCode = err.statusCode || 500;
+  const message = err.message || 'Ocorreu um erro no servidor';
+
+  res.status(statusCode).send({ message });
+});
+
 // Subindo servidor
 app.listen(PORT, () => {
   console.log(`🚀 Servidor rodando em http://localhost:${PORT}`);
