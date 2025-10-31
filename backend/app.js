@@ -3,11 +3,16 @@ const mongoose = require('mongoose');
 const usersRouter = require('./routes/users');
 const cardsRouter = require('./routes/cards');
 const usersController = require('./controllers/users');
+const validator = require('validator');
+const errors = require('celebrate').errors;
+const { requestLogger, errorLogger } = require('./middleware/logger');
 const cors = require('cors');
 const auth = require('./middleware/auth');
 
 const app = express();
 const PORT = 3001;
+
+app.use(requestLogger);
 
 app.use(express.json());
 
@@ -28,9 +33,13 @@ app.use(auth);
 app.use('/users', usersRouter);
 app.use('/cards', cardsRouter);
 
+
+app.use(errorLogger);
+app.use(errors());
+
 app.use((err, req, res, next) => {
   const statusCode = err.statusCode || 500;
-  const message = err.message || 'Ocorreu um erro no servidor';
+  const message = err.message || 'Internal Server Error';
 
   res.status(statusCode).send({ message });
 });

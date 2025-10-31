@@ -21,6 +21,7 @@
   },
   "dependencies": {
     "celebrate": "^15.0.3",
-    "cors": "^2.8.5"
+    "cors": "^2.8.5",
+    "winston": "^3.18.3"
   }
 }

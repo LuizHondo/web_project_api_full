@@ -1,126 +1,133 @@
 const User = require('../models/user');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const UnauthorizedError = require('../errors/UnauthorizedError');
+const BadRequestError = require('../errors/BadRequestError');
+const NotFoundError = require('../errors/NotFoundError');
+const ConflictError = require('../errors/ConflictError');
 
-module.exports.login = (req, res) => {
-  const { email, password } = req.body;
-
-  User.findOne({ email }).select('+password')
-    .then((user) => {
-      if (!user) {
-        return Promise.reject(new Error('Invalid email or password'));
-      }
-
-      return bcrypt.compare(password, user.password)
-        .then((matched) => {
-          if (!matched) {
-            return Promise.reject(new Error('Invalid email or password'));
-          }
-
-          // Usar variável de ambiente para JWT_SECRET
-          const secretKey = process.env.NODE_ENV === 'production'
-            ? process.env.JWT_SECRET
-            : 'dev-secret-key';
-
-          const token = jwt.sign(
-            { _id: user._id },
-            secretKey,
-            { expiresIn: '7d' }
-          );
-
-          res.send({ token });
-        });
-    })
-    .catch((err) => {
-      res.status(401).json({ message: err.message });
-    });
-};
-
-module.exports.getAllUsers = (req, res) => {
-  User.find({})
-    .then((users) => res.json(users))
-    .catch((err) => res.status(500).json({ message: 'Internal server error', error: err.message }));
-};
-module.exports.getCurrentUser = (req, res) => {
-  User.findById(req.user._id)
-    .orFail(() => {
-      const error = new Error('User not found');
-      error.statusCode = 404;
-      throw error;
-    })
-    .then((user) => res.json(user))
-    .catch((err) => {
-      if (err.name === 'CastError') {
-        return res.status(400).json({ message: 'Invalid ID' })
-      }
-      return res.status(err.statusCode || 500).json({ message: err.message });
-    });
-};
-module.exports.getUserById = (req, res) => {
-  User.findById(req.params.id)
-    .orFail(() => {
-      const error = new Error('User not found');
-      error.statusCode = 404;
-      throw error;
-    })
-    .then((user) => res.json(user))
-    .catch((err) => {
-      if (err.name === 'CastError') {
-        return res.status(400).json({ message: 'Invalid ID' })
-      }
-      return res.status(err.statusCode || 500).json({ message: err.message });
-    });
-};
-
-module.exports.createUser = (req, res, next) => {
-  const { name, about, avatar, email, password } = req.body;
-  bcrypt.hash(password, 10).then((hash)=>
-    User.create({ name, about, avatar, email, password: hash})
-  ) .then((newUser) =>{
-      const userWithoutPassword = {_id: newUser._id,name: newUser.name,about: newUser.about,avatar: newUser.avatar,email: newUser.email};
-      res.status(201).json(userWithoutPassword)
+module.exports.login = async (req, res, next) => {
+  try {
+    const { email, password } = req.body;
+    const user = await User.findOne({ email }).select('+password');
+    if (!user) {
+      throw new UnauthorizedError('Invalid email or password.');
     }
-  )
-    .catch((err) => {
-      if (err.name === 'ValidationError') {
-        return res.status(400).json({ message: 'Invalid data', error: err.message })
-      };
-      return res.status(500).json({ message: 'Internal server error', error: err.message });
-    });
+    const matched = await bcrypt.compare(password, user.password);
+    if (!matched) {
+      throw new UnauthorizedError('Invalid email or password.');
+    }
+    const secretKey =
+      process.env.NODE_ENV === 'production'
+        ? process.env.JWT_SECRET
+        : 'dev-secret-key';
+    const token = jwt.sign({ _id: user._id }, secretKey, { expiresIn: '7d' });
+    res.send({ token });
+  } catch (err) {
+    next(err);
+  }
 };
 
-module.exports.updateUser = (req, res) => {
-  const { name, about } = req.body;
-
-  User.findByIdAndUpdate(req.user._id,{ name, about },{new: true, runValidators: true})
-    .then((updatedUser) => {
-      if(!updatedUser){
-        return res.status(404).json({message:'User not found'})
-      }
-      return res.status(200).json(updatedUser)
-    })
-    .catch((err) => {
-      if (err.name === 'ValidationError') {
-        return res.status(400).json({ message: 'Invalid data', error: err.message });
-      }
-      return res.status(500).json({ message: 'Internal server error', error: err.message });
-    });
+module.exports.getAllUsers = async (req, res, next) => {
+  try {
+    const users = await User.find({});
+    res.send(users);
+  } catch (err) {
+    next(err);
+  }
 };
 
-module.exports.updateUserAvatar = (req, res) => {
-  const { avatar } = req.body;
+module.exports.getCurrentUser = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.user._id);
+    if (!user) {
+      throw new NotFoundError('User not found');
+    }
+    res.send(user);
+  } catch (err) {
+    if (err.name === 'CastError') {
+      return next(new BadRequestError('Invalid ID'));
+    }
+    next(err);
+  }
+};
 
-  User.findByIdAndUpdate(req.user._id,{ avatar },{ new: true, runValidators: true })
-    .then((updatedUserAvatar) => {
-      if(!updatedUserAvatar){
-        return res.status(404).json({message:'User not found'})
-      }
-      return res.status(200).json(updatedUserAvatar)
-    })
-    .catch((err) => {
-      if (err.name === 'ValidationError') {
-        return res.status(400).json({ message: 'Invalid data', error: err.message });
-      }
-      return res.status(500).json({ message: 'Internal server error', error: err.message });
-    });
+module.exports.getUserById = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.params.id);
+    if (!user) {
+      throw new NotFoundError('User not found');
+    }
+    res.send(user);
+  } catch (err) {
+    if (err.name === 'CastError') {
+      return next(new BadRequestError('Invalid ID'));
+    }
+    next(err);
+  }
+};
+
+module.exports.createUser = async (req, res, next) => {
+  try {
+    const { name, about, avatar, email, password } = req.body;
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      throw new ConflictError('Email already in use.');
+    }
+    const hash = await bcrypt.hash(password, 10);
+    const newUser = await User.create({name, about, avatar, email, password: hash});
+    const userWithoutPassword = {
+      _id: newUser._id,
+      name: newUser.name,
+      about: newUser.about,
+      avatar: newUser.avatar,
+      email: newUser.email,
+    };
+    res.status(201).send(userWithoutPassword);
+  } catch (err) {
+    if (err.name === 'ValidationError') {
+      return next(new BadRequestError('Invalid user data'));
+    }
+    next(err);
+  }
+};
+
+module.exports.updateUser = async (req, res, next) => {
+  try {
+    const { name, about } = req.body;
+    const updatedUser = await User.findByIdAndUpdate(
+      req.user._id,
+      { name, about },
+      { new: true, runValidators: true }
+    );
+    if (!updatedUser) {
+      throw new NotFoundError('User not found');
+    }
+    res.send(updatedUser);
+  } catch (err) {
+    if (err.name === 'ValidationError') {
+      return next(new BadRequestError('Invalid data'));
+    }
+    next(err);
+  }
+};
+
+module.exports.updateUserAvatar = async (req, res, next) => {
+  try {
+    const { avatar } = req.body;
+    const updatedUserAvatar = await User.findByIdAndUpdate(
+      req.user._id,
+      { avatar },
+      { new: true, runValidators: true }
+    );
+    if (!updatedUserAvatar) {
+      throw new NotFoundError('User not found');
+    }
+    res.send(updatedUserAvatar);
+  } catch (err) {
+    if (err.name === 'ValidationError') {
+      return next(new BadRequestError('Invalid data'));
+    }
+    next(err);
+  }
 };
