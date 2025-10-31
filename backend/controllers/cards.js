@@ -7,7 +7,7 @@ module.exports.getAllCards = (req, res) => {
 };
 
 module.exports.getCards = (req, res) => {
-  Card.find({ owner: req.user._id })  // Filtra por usuário!
+  Card.find({ owner: req.user._id })
     .then(cards => res.json(cards));
 };
 module.exports.getCardById = (req, res) => {
@@ -58,50 +58,10 @@ module.exports.deleteCard = (req, res) => {
     });
 };
 
-// module.exports.likeCard = (req, res) => {
-//   Card.findByIdAndUpdate(
-//     req.params.id,
-//     { $addToSet: { likes: req.params.id } },
-//     { new: true },
-//   )
-//     .orFail(() => {
-//       const error = new Error('Card não encontrado');
-//       error.statusCode = 404;
-//       throw error;
-//     })
-//     .then((card) => res.json(card))
-//     .catch((err) => {
-//       if (err.name === 'CastError') {
-//         return res.status(400).json({ message: 'ID inválido' });
-//       }
-
-//       return res.status(err.statusCode || 500).json({ message: err.message });
-//     });
-// };
-// module.exports.dislikeCard = (req, res) => {
-//   Card.findByIdAndUpdate(
-//     req.params.id,
-//     { $pull: { likes: req.params.id } },
-//     { new: true },
-//   )
-//     .orFail(() => {
-//       const error = new Error('Card não encontrado');
-//       error.statusCode = 404;
-//       throw error;
-//     })
-//     .then((card) => res.json(card))
-//     .catch((err) => {
-//       if (err.name === 'CastError') {
-//         return res.status(400).json({ message: 'ID inválido' });
-//       }
-
-//       return res.status(err.statusCode || 500).json({ message: err.message });
-//     });
-// };
 module.exports.likeCard = (req, res) => {
   Card.findByIdAndUpdate(
-    req.params.id, // ID do card (correto)
-    { $addToSet: { likes: req.user._id } }, // ID do usuário (corrigido!)
+    req.params.id,
+    { $addToSet: { likes: req.user._id } },
     { new: true },
   )
     .then((card) => {

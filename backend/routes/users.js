@@ -24,11 +24,21 @@ router.post('/signup', celebrate({
 router.use(auth);
 
 router.get('/me', usersController.getCurrentUser);
-router.get('/:id', usersController.getUserById);
-router.patch('/me', usersController.updateUser);
-router.patch('/me/avatar', usersController.updateUserAvatar);
-
-
-
+router.get('/:id',celebrate({
+  params: Joi.object().keys({
+    id: Joi.string().hex().length(24).required(),
+  }),
+}), usersController.getUserById);
+router.patch('/me',celebrate({
+  body: Joi.object().keys({
+    name: Joi.string().min(2).max(30).required(),
+    about: Joi.string().min(2).max(30).required(),
+  }),
+}), usersController.updateUserProfile);
+router.patch('/me/avatar', celebrate({
+  body: Joi.object().keys({
+    avatar: Joi.string().uri().required(),
+  }),
+}), usersController.updateUserAvatar);
 
 module.exports = router;
