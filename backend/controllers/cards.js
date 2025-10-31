@@ -1,64 +1,58 @@
 const Card = require('../models/card');
+const BadRequestError = require('../errors/BadRequestError');
+const NotFoundError = require('../errors/NotFoundError');
+const ForbiddenError = require('../errors/ForbiddenError');
+const ConflictError = require('../errors/ConflictError');
 
-module.exports.getAllCards = (req, res) => {
+module.exports.getAllCards = (req, res, next) => {
   Card.find({})
     .then((cards) => res.json(cards))
-    .catch((err) => res.status(500).json({ message: 'Erro interno no servidor', error: err.message }));
+    .catch(next);
 };
 
-module.exports.getCards = (req, res) => {
+module.exports.getCards = (req, res, next) => {
   Card.find({ owner: req.user._id })
-    .then(cards => res.json(cards));
+    .then(cards => res.json(cards))
+    .catch(next);
 };
-module.exports.getCardById = (req, res) => {
+module.exports.getCardById = (req, res, next) => {
   Card.findById(req.params.id)
     .orFail(() => {
-      const error = new Error('Card não encontrado');
-      error.statusCode = 404;
-      throw error;
+      throw new NotFoundError('Card not found.');
     })
     .then((card) => res.json(card))
     .catch((err) => {
       if (err.name === 'CastError') {
-        return res.status(400).json({ message: 'ID inválido' });
+        return next(new BadRequestError('Invalid card ID.'));
       }
 
-      return res.status(err.statusCode || 500).json({ message: err.message });
+      return next(err);
     });
 };
 
-module.exports.createCard = (req, res) => {
-  const { name, link, owner } = req.body;
+module.exports.createCard = (req, res, next) => {
+  const { name, link } = req.body;
+  const owner = req.user._id;
 
   Card.create({ name, link, owner })
     .then((newCard) => res.status(201).json(newCard))
-    .catch((err) => {
-      if (err.name === 'CastError') {
-        return res.status(400).json({ message: 'ID inválido' });
-      }
-
-      return res.status(err.statusCode || 500).json({ message: err.message });
-    });
+    .catch(next);
 };
 
-module.exports.deleteCard = (req, res) => {
-  Card.findByIdAndDelete(req.params.id)
-    .orFail(() => {
-      const error = new Error('Card não encontrado');
-      error.statusCode = 404;
-      throw error;
+module.exports.deleteCard = (req, res, next) => {
+  Card.findById(req.params.id)
+    .orFail(() => new NotFoundError('Card not found.'))
+    .then((card) => {
+      if (card.owner.toString() !== req.user._id) {
+        throw new ForbiddenError('You do not have permission to delete this card.');
+      }
+      return Card.findByIdAndDelete(req.params.id);
     })
-    .then((card) => res.json(card))
-    .catch((err) => {
-      if (err.name === 'CastError') {
-        return res.status(400).json({ message: 'ID inválido' });
-      }
-
-      return res.status(err.statusCode || 500).json({ message: err.message });
-    });
+    .then((deletedCard) => res.json(deletedCard))
+    .catch(next);
 };
 
-module.exports.likeCard = (req, res) => {
+module.exports.likeCard = (req, res, next) => {
   Card.findByIdAndUpdate(
     req.params.id,
     { $addToSet: { likes: req.user._id } },
@@ -66,38 +60,34 @@ module.exports.likeCard = (req, res) => {
   )
     .then((card) => {
       if (!card) {
-        const error = new Error('Card não encontrado');
-        error.statusCode = 404;
-        throw error;
+        return next(new NotFoundError('Card not found.'));
       }
       res.json(card);
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        return res.status(400).json({ message: 'ID inválido' });
+        return next(new BadRequestError('Invalid card ID.'));
       }
-      return res.status(err.statusCode || 500).json({ message: err.message });
+      return next(err);
     });
 };
 
-module.exports.dislikeCard = (req, res) => {
+module.exports.dislikeCard = (req, res, next) => {
   Card.findByIdAndUpdate(
-    req.params.id, // ID do card (correto)
-    { $pull: { likes: req.user._id } }, // ID do usuário (corrigido!)
+    req.params.id,
+    { $pull: { likes: req.user._id } },
     { new: true },
   )
     .then((card) => {
       if (!card) {
-        const error = new Error('Card não encontrado');
-        error.statusCode = 404;
-        throw error;
+        return next(new NotFoundError('Card not found.'));
       }
       res.json(card);
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        return res.status(400).json({ message: 'ID inválido' });
+        return next(new BadRequestError('Invalid card ID.'));
       }
-      return res.status(err.statusCode || 500).json({ message: err.message });
+      return next(err);
     });
 };
