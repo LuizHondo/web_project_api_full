@@ -22,6 +22,7 @@
   "dependencies": {
     "celebrate": "^15.0.3",
     "cors": "^2.8.5",
+    "express-winston": "^4.2.0",
     "winston": "^3.18.3"
   }
 }

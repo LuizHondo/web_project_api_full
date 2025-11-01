@@ -1,6 +1,7 @@
 const User = require('../models/user');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const { logger } = require('../middleware/logger');
 const UnauthorizedError = require('../errors/UnauthorizedError');
 const BadRequestError = require('../errors/BadRequestError');
 const NotFoundError = require('../errors/NotFoundError');
@@ -11,10 +12,12 @@ module.exports.login = async (req, res, next) => {
     const { email, password } = req.body;
     const user = await User.findOne({ email }).select('+password');
     if (!user) {
+      logger.warn(`Login attempt with non-existent email: ${email}`);
       throw new UnauthorizedError('Invalid email or password.');
     }
     const matched = await bcrypt.compare(password, user.password);
     if (!matched) {
+      logger.warn(`Incorrect password for email: ${email}`);
       throw new UnauthorizedError('Invalid email or password.');
     }
     const secretKey =
@@ -22,8 +25,10 @@ module.exports.login = async (req, res, next) => {
         ? process.env.JWT_SECRET
         : 'dev-secret-key';
     const token = jwt.sign({ _id: user._id }, secretKey, { expiresIn: '7d' });
+    logger.info(`User logged in successfully: ${email}`);
     res.send({ token });
   } catch (err) {
+    logger.error(`Login error: ${err.message}`);
     next(err);
   }
 };
@@ -31,8 +36,10 @@ module.exports.login = async (req, res, next) => {
 module.exports.getAllUsers = async (req, res, next) => {
   try {
     const users = await User.find({});
+    logger.info(`Successfully retrieved ${users.length} users.`);
     res.send(users);
   } catch (err) {
+    logger.error(`Error retrieving users: ${err.message}`);
     next(err);
   }
 };
@@ -41,13 +48,16 @@ module.exports.getCurrentUser = async (req, res, next) => {
   try {
     const user = await User.findById(req.user._id);
     if (!user) {
-      throw new NotFoundError('User not found');
+      throw new NotFoundError('User not found.');
     }
+    logger.info(`Current user data retrieved: ${user.email}`);
     res.send(user);
   } catch (err) {
     if (err.name === 'CastError') {
-      return next(new BadRequestError('Invalid ID'));
+      logger.warn(`Invalid user ID in getCurrentUser: ${req.user._id}`);
+      return next(new BadRequestError('Invalid user ID.'));
     }
+    logger.error(`Error in getCurrentUser: ${err.message}`);
     next(err);
   }
 };
@@ -56,13 +66,16 @@ module.exports.getUserById = async (req, res, next) => {
   try {
     const user = await User.findById(req.params.id);
     if (!user) {
-      throw new NotFoundError('User not found');
+      throw new NotFoundError('User not found.');
     }
+    logger.info(`User retrieved by ID: ${req.params.id}`);
     res.send(user);
   } catch (err) {
     if (err.name === 'CastError') {
-      return next(new BadRequestError('Invalid ID'));
+      logger.warn(`Invalid ID in getUserById: ${req.params.id}`);
+      return next(new BadRequestError('Invalid user ID.'));
     }
+    logger.error(`Error in getUserById: ${err.message}`);
     next(err);
   }
 };
@@ -72,10 +85,17 @@ module.exports.createUser = async (req, res, next) => {
     const { name, about, avatar, email, password } = req.body;
     const existingUser = await User.findOne({ email });
     if (existingUser) {
+      logger.warn(`Attempt to create user with duplicate email: ${email}`);
       throw new ConflictError('Email already in use.');
     }
     const hash = await bcrypt.hash(password, 10);
-    const newUser = await User.create({name, about, avatar, email, password: hash});
+    const newUser = await User.create({
+      name,
+      about,
+      avatar,
+      email,
+      password: hash,
+    });
     const userWithoutPassword = {
       _id: newUser._id,
       name: newUser.name,
@@ -83,11 +103,14 @@ module.exports.createUser = async (req, res, next) => {
       avatar: newUser.avatar,
       email: newUser.email,
     };
+    logger.info(`New user created: ${email}`);
     res.status(201).send(userWithoutPassword);
   } catch (err) {
     if (err.name === 'ValidationError') {
-      return next(new BadRequestError('Invalid user data'));
+      logger.warn(`Validation error while creating user: ${err.message}`);
+      return next(new BadRequestError('Invalid user data.'));
     }
+    logger.error(`Error creating user: ${err.message}`);
     next(err);
   }
 };
@@ -101,13 +124,16 @@ module.exports.updateUser = async (req, res, next) => {
       { new: true, runValidators: true }
     );
     if (!updatedUser) {
-      throw new NotFoundError('User not found');
+      throw new NotFoundError('User not found.');
     }
+    logger.info(`User ${req.user._id} updated successfully.`);
     res.send(updatedUser);
   } catch (err) {
     if (err.name === 'ValidationError') {
-      return next(new BadRequestError('Invalid data'));
+      logger.warn(`Validation error while updating user: ${err.message}`);
+      return next(new BadRequestError('Invalid user data.'));
     }
+    logger.error(`Error updating user: ${err.message}`);
     next(err);
   }
 };
@@ -121,13 +147,16 @@ module.exports.updateUserAvatar = async (req, res, next) => {
       { new: true, runValidators: true }
     );
     if (!updatedUserAvatar) {
-      throw new NotFoundError('User not found');
+      throw new NotFoundError('User not found.');
     }
+    logger.info(`User ${req.user._id} avatar updated successfully.`);
     res.send(updatedUserAvatar);
   } catch (err) {
     if (err.name === 'ValidationError') {
-      return next(new BadRequestError('Invalid data'));
+      logger.warn(`Validation error while updating avatar: ${err.message}`);
+      return next(new BadRequestError('Invalid avatar data.'));
     }
+    logger.error(`Error updating avatar: ${err.message}`);
     next(err);
   }
 };

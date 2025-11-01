@@ -34,7 +34,7 @@ router.patch('/me',celebrate({
     name: Joi.string().min(2).max(30).required(),
     about: Joi.string().min(2).max(30).required(),
   }),
-}), usersController.updateUserProfile);
+}), usersController.updateUser);
 router.patch('/me/avatar', celebrate({
   body: Joi.object().keys({
     avatar: Joi.string().uri().required(),
