@@ -1,63 +1,40 @@
-.popup-confirmation{
-  width: 100vw;
-  height: 100vh;
-  position: fixed;
-  top: 0;
-  left: 0;
-  background-color: rgba(0, 0, 0, 0.5);
+.popup__confirmation {
   display: flex;
-  align-items: center;
+  flex-direction: column;
+  width: 100%;
+}
+
+.popup__confirmation-text {
+  font-family: Inter, sans-serif;
+  font-weight: 900;
+  font-size: 24px;
+  line-height: 100%;
+  letter-spacing: 0%;
+  margin: 0 0 38px 0;
+}
+
+.popup__confirmation-buttons {
+  display: flex;
+  gap: 16px;
+  width: 100%;
+}
+
+.popup__button_confirm,
+.popup__button_cancel {
+  flex: 1;
+  padding: 13.5px 0 18.5px;
+  margin: 0;
+  display: flex;
   justify-content: center;
-  margin: 0 auto;
-}
-.popup-confirmation_inactive{
-    display: none;
-}
-.popup-confirmation__container{
-
-    position: fixed;
-    background-color: white;
-    color: black;
-    border-radius: 10px;
-    box-shadow: 0px 0px 25px 0px #00000026;
-    width: 33.59vw;
-    background-color: white;
-    border-radius: 16px;
-    padding: 36px;
-    margin: 0px;
-}
-.popup-confirmation__text{
-    font-family: Inter;
-    font-weight: 900;
-    font-size: 24px;
-    line-height: 100%;
-    letter-spacing: 0%;
-    margin: 0px;
-}
-.popup-confirmation__button{
-    cursor: pointer;
-    font-family: Inter;
-    font-weight: 400;
-    font-size: 18px;
-    line-height: 21.78px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background-color: black;
-    color: #fff;
-    padding: 13.5px 124px 18.5px;
-    width: 100%;
-    border-radius: 2px;
-    margin: 0px;
-    margin-top: 38px;
+  align-items: center;
 }
 
-.popup-confirmation__close-button {
-  position: absolute;
-  top: -32px;
-  right: -32px;
-  cursor: pointer;
+.popup__button_cancel {
+  background-color: #fff;
+  color: black;
+  border: 1px solid rgba(0, 0, 0, 0.3);
 }
-.popup-confirmation__close-button:hover{
-opacity: 60%;
+
+.popup__button_cancel:hover {
+  background-color: rgba(0, 0, 0, 0.05);
 }

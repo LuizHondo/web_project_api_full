@@ -2,7 +2,7 @@ import { useContext, useState } from "react";
 import CurrentUserContext from '../../../../../contexts/CurrentUserContext';
 
 export default function NewCard() {
-  const { currentUser , handleAddPlaceSubmit} = useContext(CurrentUserContext)
+  const { handleAddPlaceSubmit} = useContext(CurrentUserContext)
   const [title, setTitle] = useState();
   const [link, setLink] = useState();
 

@@ -18,8 +18,14 @@ app.use(cors());
 app.use(requestLogger);
 
 mongoose.connect('mongodb://localhost:27017/aroundb')
-  .then(() => console.log('✅ Conectado ao MongoDB'))
-  .catch((err) => console.error('❌ Erro ao conectar ao MongoDB', err));
+.then(() => console.log('✅ Conectado ao MongoDB'))
+.catch((err) => console.error('❌ Erro ao conectar ao MongoDB', err));
+
+app.get('/crash-test', () => {
+  setTimeout(() => {
+    throw new Error('O servidor travará agora');
+  }, 0);
+});
 
 app.post('/signin', usersController.login);
 app.post('/signup', usersController.createUser);

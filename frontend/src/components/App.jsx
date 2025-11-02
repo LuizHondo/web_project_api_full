@@ -182,7 +182,11 @@ export default function App() {
             element={
               isLoggedIn ? 
                 <Navigate to="/" replace /> : 
-                <Login onLogin={handleLogin} />
+                <Login 
+                onLogin={handleLogin}
+                popup={popup}
+                onClosePopup={handleClosePopup}
+                />
             } 
           />
           
@@ -191,7 +195,11 @@ export default function App() {
             element={
               isLoggedIn ? 
                 <Navigate to="/signin" replace /> : 
-                <Register onRegister={handleRegister} />
+                <Register
+                 onRegister={handleRegister} 
+                 popup={popup}
+                 onClosePopup={handleClosePopup}
+                />
             } 
           />
           

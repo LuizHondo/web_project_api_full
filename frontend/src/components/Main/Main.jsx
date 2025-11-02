@@ -3,6 +3,7 @@ import Popup from "./components/Popup/Popup";
 import NewCard from "./components/Popup/NewCard/NewCard";
 import EditProfile from "./components/Popup/EditProfile/EditProfile";
 import EditAvatar from "./components/Popup/EditAvatar/EditAvatar";
+import DeleteConfirmation from "./components/Popup/DeleteConfirmation/DeleteConfirmation";
 import Card from "./components/Card/Card";
 import ImagePopup from "./components/Popup/ImagePopup/ImagePopup";
 
@@ -22,6 +23,22 @@ export default function Main({popup,
   const editAvatarPopup = {title:"Alterar foto de perfil",children:<EditAvatar/>}
 
   const { currentUser } = useContext(CurrentUserContext);
+
+  function handleDeleteConfirmation(card) {
+    const deleteConfirmationPopup = {
+      title: "Are you sure you want to delete this card?",
+      children: (
+        <DeleteConfirmation
+          onConfirm={() => {
+            onCardDelete(card);
+            onClosePopup();
+          }}
+          onCancel={onClosePopup}
+        />
+      )
+    };
+    onOpenPopup(deleteConfirmationPopup);
+  }
 
 
   
@@ -70,7 +87,8 @@ export default function Main({popup,
                   card={card}
                   ImagePopup={ImagePopup}
                   onCardLike={onCardLike}
-                  onCardDelete={onCardDelete}
+                  onCardDelete={handleDeleteConfirmation}
+                  currentUser={currentUser}
                 />
               ))}
             </ul>

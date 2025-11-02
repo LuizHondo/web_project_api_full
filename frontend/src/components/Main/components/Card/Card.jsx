@@ -5,6 +5,9 @@ export default function Card(props) {
   const handlePopup = props.handler;
   const imageComponent = {title:name,children:<ImagePopup card={props.card}/>}
   const cardLikeButtonClassName = `card__like-button ${isLiked ? 'card__heart_active' : ''}`;
+  const currentUserId = props.currentUser?._id || props.currentUser?.id;
+  const cardOwnerId = card.owner?._id || card.owner;
+  const isOwner = currentUserId && cardOwnerId && String(currentUserId) === String(cardOwnerId);
 
   function handleLikeClick(){
     props.onCardLike(card)
@@ -20,12 +23,14 @@ export default function Card(props) {
         alt="Imagem do Cartão"
         onClick={()=>{handlePopup(imageComponent)}}
       />
-      <button
-        aria-label="Delete card"
-        className="card__delete-button"
-        type="button"
-        onClick={handleDeleteClick}
-      />
+      {isOwner && (
+        <button
+          aria-label="Delete card"
+          className="card__delete-button"
+          type="button"
+          onClick={handleDeleteClick}
+        />
+      )}
       <div className="card__description">
         <h2 className="card__title">{name}</h2>
         <button
