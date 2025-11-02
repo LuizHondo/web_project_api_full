@@ -1,16 +1,15 @@
 import { useEffect, useState } from 'react';
-import { Routes, Route, useNavigate, Navigate } from 'react-router-dom';
-import Footer from "./Footer/Footer.jsx";
-import Header from "./Header/Header.jsx";
-import Main from "./Main/Main.jsx";
+import { Routes, Route, Navigate } from 'react-router-dom';
+import Footer from './Footer/Footer.jsx';
+import Header from './Header/Header.jsx';
+import Main from './Main/Main.jsx';
 import Login from './Login.jsx';
 import Register from './Register.jsx';
 import ProtectedRoute from './ProtectedRoute.jsx';
 import InfoTooltip from './InfoTooltip.jsx';
-import api from "../utils/api.js";
-import * as auth from "../utils/auth.js";
-import CurrentUserContext from "../contexts/CurrentUserContext.js";
-
+import api from '../utils/api.js';
+import * as auth from '../utils/auth.js';
+import CurrentUserContext from '../contexts/CurrentUserContext.js';
 
 export default function App() {
   const [currentUser, setCurrentUser] = useState({});
@@ -20,74 +19,77 @@ export default function App() {
   const [email, setEmail] = useState('');
   const [isInfoTooltipOpen, setIsInfoTooltipOpen] = useState(false);
   const [tooltipStatus, setTooltipStatus] = useState('');
- // Verificação do token no carregamento da aplicação
+
   useEffect(() => {
     const token = localStorage.getItem('jwt');
-    if (token) {
-      auth.checkToken(token)
-        .then((res) => {
-          if (res) {
-            setEmail(res.email);
-            setIsLoggedIn(true);
-          }
-        })
-        .catch((err) => {
-          console.error('Token inválido:', err);
-          // localStorage.removeItem('jwt');
-        });
+    if (!token) {
+      console.log('No token found');
+      return;
     }
-    else{console.log('No token found');}
-  }, []);
-  
-  useEffect(() => {
-    if (isLoggedIn) {
-      Promise.all([api.getUserInfo(), api.getInitialCards()])
-        .then(([userData, cardsData]) => {
-          setCurrentUser(userData);
-          const normalizedCards = (cardsData || []).map((card) => ({
-            ...card,
-            isLiked: Array.isArray(card.likes)
-              ? card.likes.some((id) => String(id) === String(userData._id))
-              : Boolean(card.isLiked)
-          }));
-          setCards(normalizedCards);
-        })
-        .catch((err) => console.error(err));
-    }
-  }, [isLoggedIn]);
 
-  function handleOpenPopup(popup) {
-    setPopup(popup);
-  }
-
-  function handleClosePopup() {
-    setPopup(null);
-  }
-
-  const handleLogin = (email, password) => {
-    return auth.authorize(email, password)
-      .then((data) => {
-        if (data.token) {
-          localStorage.setItem('jwt', data.token);
-          setEmail(email);
+    auth.checkToken(token)
+      .then((res) => {
+        if (res) {
+          setEmail(res.email);
           setIsLoggedIn(true);
-          return data;
         }
       })
       .catch((err) => {
-        console.error('Erro no login:', err);
+        console.error('Invalid token:', err);
+      });
+  }, []);
+
+  useEffect(() => {
+    if (!isLoggedIn) {
+      return;
+    }
+
+    Promise.all([api.getUserInfo(), api.getInitialCards()])
+      .then(([userData, cardsData]) => {
+        setCurrentUser(userData);
+        const normalizedCards = (cardsData || []).map((card) => ({
+          ...card,
+          isLiked: Array.isArray(card.likes)
+            ? card.likes.some((id) => String(id) === String(userData._id))
+            : Boolean(card.isLiked),
+        }));
+        setCards(normalizedCards);
+      })
+      .catch((err) => console.error('Error loading initial data:', err));
+  }, [isLoggedIn]);
+
+  const handleOpenPopup = (nextPopup) => {
+    setPopup(nextPopup);
+  };
+
+  const handleClosePopup = () => {
+    setPopup(null);
+  };
+
+  const handleLogin = (userEmail, password) => {
+    return auth.authorize(userEmail, password)
+      .then((data) => {
+        if (data.token) {
+          localStorage.setItem('jwt', data.token);
+          setEmail(userEmail);
+          setIsLoggedIn(true);
+        }
+        return data;
+      })
+      .catch((err) => {
+        console.error('Login error:', err);
         throw err;
       });
   };
 
-  const handleRegister = (email, password) => {
-    return auth.register(email, password)
+  const handleRegister = (userEmail, password) => {
+    return auth.register(userEmail, password)
       .then(() => {
         setTooltipStatus('success');
         setIsInfoTooltipOpen(true);
       })
       .catch((err) => {
-        console.error('Erro no registro:', err);
+        console.error('Registration error:', err);
         setTooltipStatus('error');
         setIsInfoTooltipOpen(true);
         throw err;
@@ -108,7 +110,7 @@ export default function App() {
         setCurrentUser(newData);
         handleClosePopup();
       })
-      .catch((err) => console.error(err));
+      .catch((err) => console.error('Profile update error:', err));
   };
 
   const handleUpdateAvatar = (data) => {
@@ -117,7 +119,7 @@ export default function App() {
         setCurrentUser(newData);
         handleClosePopup();
       })
-      .catch((err) => console.error(err));
+      .catch((err) => console.error('Avatar update error:', err));
   };
 
   const handleCardLike = (card) => {
@@ -128,13 +130,13 @@ export default function App() {
           ...updated,
           isLiked: Array.isArray(updated.likes)
             ? updated.likes.some((id) => String(id) === String(currentUser._id))
-            : Boolean(updated.isLiked)
+            : Boolean(updated.isLiked),
         };
         setCards((state) =>
-          state.map((c) => (c._id === card._id ? newCard : c))
+          state.map((c) => (c._id === card._id ? newCard : c)),
         );
       })
-      .catch((err) => console.error(err));
+      .catch((err) => console.error('Toggle like error:', err));
   };
 
   const handleCardDelete = (card) => {
@@ -142,7 +144,7 @@ export default function App() {
       .then(() => {
         setCards((state) => state.filter((c) => c._id !== card._id));
       })
-      .catch((err) => console.error(err));
+      .catch((err) => console.error('Delete card error:', err));
   };
 
   const handleAddPlaceSubmit = (data) => {
@@ -152,34 +154,34 @@ export default function App() {
           ...created,
           isLiked: Array.isArray(created.likes)
             ? created.likes.some((id) => String(id) === String(currentUser._id))
-            : false
+            : false,
         };
         setCards((state) => [newCard, ...state]);
         handleClosePopup();
       })
-      .catch((err) => console.error(err));
+      .catch((err) => console.error('Add card error:', err));
   };
 
   return (
-    <CurrentUserContext.Provider value={{ 
-      currentUser, 
-      handleUpdateUser, 
-      handleUpdateAvatar, 
-      handleAddPlaceSubmit 
+    <CurrentUserContext.Provider value={{
+      currentUser,
+      handleUpdateUser,
+      handleUpdateAvatar,
+      handleAddPlaceSubmit,
     }}>
       <div className="page">
-        <Header 
+        <Header
           email={email}
           onSignOut={handleSignOut}
           isLoggedIn={isLoggedIn}
         />
-        
+
         <Routes>
-          <Route 
-            path="/" 
+          <Route
+            path="/"
             element={
               <ProtectedRoute isLoggedIn={isLoggedIn}>
-                <Main  
+                <Main
                   onOpenPopup={handleOpenPopup}
                   onClosePopup={handleClosePopup}
                   popup={popup}
@@ -189,47 +191,51 @@ export default function App() {
                   onCardAddSubmit={handleAddPlaceSubmit}
                 />
               </ProtectedRoute>
-            } 
+            }
           />
-          
-          <Route 
-            path="/signin" 
+
+          <Route
+            path="/signin"
             element={
-              isLoggedIn ? 
-                <Navigate to="/" replace /> : 
-                <Login 
-                onLogin={handleLogin}
-                popup={popup}
-                onClosePopup={handleClosePopup}
-                />
-            } 
+              isLoggedIn
+                ? <Navigate to="/" replace />
+                : (
+                  <Login
+                    onLogin={handleLogin}
+                    popup={popup}
+                    onClosePopup={handleClosePopup}
+                  />
+                )
+            }
           />
-          
-          <Route 
-            path="/signup" 
+
+          <Route
+            path="/signup"
             element={
-              isLoggedIn ? 
-                <Navigate to="/signin" replace /> : 
-                <Register
-                 onRegister={handleRegister} 
-                 popup={popup}
-                 onClosePopup={handleClosePopup}
-                />
-            } 
+              isLoggedIn
+                ? <Navigate to="/" replace />
+                : (
+                  <Register
+                    onRegister={handleRegister}
+                    popup={popup}
+                    onClosePopup={handleClosePopup}
+                  />
+                )
+            }
           />
-          
-          <Route 
-            path="*" 
+
+          <Route
+            path="*"
             element={
-              isLoggedIn ? 
-                <Navigate to="/" replace /> : 
-                <Navigate to="/signin" replace />
-            } 
+              isLoggedIn
+                ? <Navigate to="/" replace />
+                : <Navigate to="/signin" replace />
+            }
           />
         </Routes>
-        
+
         <Footer />
-        
+
         <InfoTooltip
           isOpen={isInfoTooltipOpen}
           onClose={() => setIsInfoTooltipOpen(false)}

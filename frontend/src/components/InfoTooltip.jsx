@@ -4,6 +4,8 @@ import errorIcon from '../images/error-icon.svg';
 export default function InfoTooltip({ isOpen, onClose, status }) {
   if (!isOpen) return null;
 
+  const isSuccess = status === 'success';
+
   return (
     <div className={`popup ${isOpen ? 'popup_opened' : ''}`}>
       <div className="popup__container">
@@ -14,14 +16,13 @@ export default function InfoTooltip({ isOpen, onClose, status }) {
         />
         <img
           className="popup__icon"
-          src={status === 'success' ? successIcon : errorIcon}
-          alt={status === 'success' ? 'Sucesso' : 'Erro'}
+          src={isSuccess ? successIcon : errorIcon}
+          alt={isSuccess ? 'Success' : 'Error'}
         />
         <h2 className="popup__title">
-          {status === 'success' 
-            ? 'Sucesso! Você foi registrado.' 
-            : 'Ops, algo deu errado! Por favor, tente novamente.'
-          }
+          {isSuccess
+            ? 'Success! You have been registered.'
+            : 'Oops, something went wrong. Please try again.'}
         </h2>
       </div>
     </div>

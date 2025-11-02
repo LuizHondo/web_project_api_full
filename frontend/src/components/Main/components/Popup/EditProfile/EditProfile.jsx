@@ -1,31 +1,20 @@
-import { useState, useContext } from 'react';
+import { useState, useContext, useEffect } from 'react';
 import CurrentUserContext from '../../../../../contexts/CurrentUserContext';
-
 
 export default function EditProfile() {
   const { currentUser, handleUpdateUser } = useContext(CurrentUserContext);
+  const [name, setName] = useState('');
+  const [description, setDescription] = useState('');
 
-  // Variáveis de estado vinculadas aos valores atuais do usuário
-  const [name, setName] = useState(currentUser.name);
-  const [description, setDescription] = useState(currentUser.about);
-
-
-  // Usuário digita "João Santos"
-  // handleNameChange é chamado
-  const handleNameChange = (event) => {
-    setName(event.target.value); // "João Santos"
-  };
-  
-  // Manipulador para o campo descrição
-  const handleDescriptionChange = (event) => {
-    setDescription(event.target.value);
-  };
+  useEffect(() => {
+    setName(currentUser.name || '');
+    setDescription(currentUser.about || '');
+  }, [currentUser]);
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    handleUpdateUser({name,about: description})
-  }
-
+    handleUpdateUser({ name, about: description });
+  };
 
   return (
     <form
@@ -36,17 +25,17 @@ export default function EditProfile() {
       noValidate
     >
       <label className="popup__field">
-        <input 
+        <input
           className="popup__input popup__input_type_name"
           id="popup-edit-profile-name"
           maxLength="40"
           minLength="2"
           name="popup-edit-profile-name"
-          placeholder="Nome"
+          placeholder="Name"
           type="text"
           required
           value={name}
-          onChange={handleNameChange}
+          onChange={(event) => setName(event.target.value)}
         />
         <span className="popup__error" id="popup-edit-profile-name-error"></span>
       </label>
@@ -58,11 +47,11 @@ export default function EditProfile() {
           name="popup-edit-profile-description"
           maxLength="200"
           minLength="2"
-          placeholder="Sobre mim"
+          placeholder="About me"
           value={description}
           required
           type="text"
-          onChange={handleDescriptionChange}
+          onChange={(event) => setDescription(event.target.value)}
         />
         <span
           className="popup__error"
@@ -70,12 +59,12 @@ export default function EditProfile() {
         ></span>
       </label>
 
-      <button 
-        className="button popup__button" 
-        type="submit" 
-        aria-label="Salvar"
-        >
-        Salvar
+      <button
+        className="button popup__button"
+        type="submit"
+        aria-label="Save changes"
+      >
+        Save
       </button>
     </form>
   );

@@ -1,7 +1,6 @@
 const mongoose = require('mongoose');
 
-// Reutilizando regex de URL do user
-const urlRegex = /^https?:\/\/(www\.)?[\w\-._~:/?%#[\]@!$&'()*+,;=]+#?$/;
+const urlRegex = /^https?:\/\/(www\.)?[\w\-._~:\/?%#[\]@!$&'()*+,;=]+#?$/;
 
 const cardSchema = new mongoose.Schema({
   name: {
@@ -14,14 +13,14 @@ const cardSchema = new mongoose.Schema({
     type: String,
     required: true,
     validate: {
-      validator: (v) => urlRegex.test(v),
-      message: 'URL inválida para a imagem do card',
+      validator: (value) => urlRegex.test(value),
+      message: 'Invalid URL for card image',
     },
   },
   owner: {
     type: mongoose.Schema.Types.ObjectId,
     required: true,
-    ref: 'user', // referência ao modelo User
+    ref: 'user',
   },
   createdAt: {
     type: Date,

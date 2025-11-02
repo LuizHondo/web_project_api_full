@@ -1,22 +1,22 @@
-import logo from "../../images/logo.svg";
+import logo from '../../images/logo.svg';
 
 export default function Header({ email, onSignOut, isLoggedIn }) {
   return (
-    <header className={isLoggedIn ? "header" : "header__anonymous"}>
+    <header className={isLoggedIn ? 'header' : 'header__anonymous'}>
       <img
         className="header__logo"
         src={logo}
-        alt="Logotipo Around US"
+        alt="Around US logo"
       />
       {isLoggedIn && (
         <div className="header__nav">
           <span className="header__email">{email}</span>
-          <button 
-            className="header__button" 
+          <button
+            className="header__button"
             onClick={onSignOut}
             type="button"
           >
-            Sair
+            Sign out
           </button>
         </div>
       )}

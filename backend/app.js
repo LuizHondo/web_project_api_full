@@ -18,12 +18,12 @@ app.use(cors());
 app.use(requestLogger);
 
 mongoose.connect('mongodb://localhost:27017/aroundb')
-.then(() => console.log('�o. Conectado ao MongoDB'))
-.catch((err) => console.error('�?O Erro ao conectar ao MongoDB', err));
+  .then(() => console.log('Connected to MongoDB'))
+  .catch((err) => console.error('Error connecting to MongoDB', err));
 
 app.get('/crash-test', () => {
   setTimeout(() => {
-    throw new Error('O servidor travarA� agora');
+    throw new Error('The server will crash now');
   }, 0);
 });
 
@@ -43,16 +43,16 @@ app.use((err, req, res, next) => {
   const { statusCode = 500, message } = err;
 
   if (process.env.NODE_ENV !== 'production') {
-    console.error('�s��,? Erro detectado:', err);
+    console.error('Error detected:', err);
   }
 
   res.status(statusCode).send({
     message: statusCode === 500
-      ? 'Erro interno no servidor'
+      ? 'Internal server error'
       : message,
   });
 });
 
 app.listen(PORT, () => {
-  console.log(`dYs? Servidor rodando em http://localhost:${PORT}`);
+  console.log(`Server running at http://localhost:${PORT}`);
 });

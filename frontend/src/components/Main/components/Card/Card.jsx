@@ -3,14 +3,11 @@ export default function Card(props) {
   const { ImagePopup } = props;
   const card = props.card;
   const handlePopup = props.handler;
-  const imageComponent = {title:name,children:<ImagePopup card={props.card}/>}
+  const imageComponent = { title: name, children: <ImagePopup card={props.card} /> };
   const cardLikeButtonClassName = `card__like-button ${isLiked ? 'card__heart_active' : ''}`;
-  
-  // Extract current user ID - handle both _id and id properties
+
   const currentUserId = props.currentUser?._id || props.currentUser?.id;
-  
-  // Extract card owner ID - handle both object with _id and string ID
-  // Card.owner can be: string ID, object with _id, or object with id
+
   let cardOwnerId;
   if (card.owner) {
     if (typeof card.owner === 'object' && card.owner !== null) {
@@ -19,14 +16,10 @@ export default function Card(props) {
       cardOwnerId = String(card.owner);
     }
   }
-  
-  // Compare IDs as strings, ensuring both exist and match
-  // isOwner = true means: current user IS the card owner (SHOW button, ALLOW delete)
-  // isOwner = false means: current user is NOT the card owner (HIDE button, BLOCK delete)
-  const isOwner = currentUserId && cardOwnerId && 
-                  String(currentUserId) === String(cardOwnerId);
-  
-  // Debug logging for troubleshooting ownership issues
+
+  const isOwner = currentUserId && cardOwnerId &&
+    String(currentUserId) === String(cardOwnerId);
+
   console.log('Card ownership check:', {
     cardId: card._id,
     cardName: card.name,
@@ -34,15 +27,14 @@ export default function Card(props) {
     cardOwnerId,
     isOwner,
     currentUser: props.currentUser,
-    cardOwner: card.owner
+    cardOwner: card.owner,
   });
 
-  function handleLikeClick(){
-    props.onCardLike(card)
+  function handleLikeClick() {
+    props.onCardLike(card);
   }
-  
-  function handleDeleteClick(){
-    // Double-check ownership before allowing delete action
+
+  function handleDeleteClick() {
     if (!isOwner) {
       console.warn('Delete attempt blocked: User is not the card owner');
       return;
@@ -50,12 +42,13 @@ export default function Card(props) {
     props.onCardDelete(card);
   }
 
-  return (  
+  return (
     <li className="card">
-      <img className="card__image"
+      <img
+        className="card__image"
         src={link}
-        alt="Imagem do Cartão"
-        onClick={()=>{handlePopup(imageComponent)}}
+        alt="Card"
+        onClick={() => { handlePopup(imageComponent); }}
       />
       {isOwner && (
         <button

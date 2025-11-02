@@ -1,24 +1,24 @@
-import { useContext, useState } from "react";
+import { useContext, useState } from 'react';
 import CurrentUserContext from '../../../../../contexts/CurrentUserContext';
 
 export default function NewCard() {
-  const { handleAddPlaceSubmit} = useContext(CurrentUserContext)
-  const [title, setTitle] = useState();
-  const [link, setLink] = useState();
-
-
+  const { handleAddPlaceSubmit } = useContext(CurrentUserContext);
+  const [title, setTitle] = useState('');
+  const [link, setLink] = useState('');
 
   function handleNewCardSubmit(event) {
-    event.preventDefault()
-    handleAddPlaceSubmit({name:title,link:link})
+    event.preventDefault();
+    handleAddPlaceSubmit({ name: title, link });
   }
 
-  function handleNewCardTitle(event){
-    setTitle(event.target.value)
+  function handleNewCardTitle(event) {
+    setTitle(event.target.value);
   }
-  function handleNewCardLink(event){
-    setLink(event.target.value)
+
+  function handleNewCardLink(event) {
+    setLink(event.target.value);
   }
+
   return (
     <form
       className="popup__form"
@@ -34,9 +34,10 @@ export default function NewCard() {
           maxLength="30"
           minLength="1"
           name="popup-new-card-name"
-          placeholder="Título"
+          placeholder="Title"
           required
           type="text"
+          value={title}
           onChange={handleNewCardTitle}
         />
         <span className="popup__error" id="popup-new-card-name-error"></span>
@@ -47,21 +48,18 @@ export default function NewCard() {
           className="popup__input popup__input_type_url"
           id="popup-new-card-link"
           name="popup-new-card-link"
-          placeholder="Link da imagem"
+          placeholder="Image URL"
           required
           type="url"
+          value={link}
           onChange={handleNewCardLink}
         />
         <span className="popup__error" id="popup-new-card-link-error"></span>
       </label>
 
       <button className="button popup__button" type="submit">
-        Salvar
+        Save
       </button>
     </form>
   );
 }
-
-
-
-

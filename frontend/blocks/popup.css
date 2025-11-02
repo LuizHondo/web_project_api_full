@@ -9,7 +9,6 @@
   align-items: center;
   justify-content: center;
   margin: 0 auto;
-
 }
 
 .popup_hidden {
@@ -21,14 +20,13 @@
   max-height: 80vh;
   max-width: 95vw;
   height: auto;
-  width: auto;
   position: fixed;
   background-color: white;
   color: black;
   border-radius: 10px;
   padding: 34px 36px 36.5px;
   box-shadow: 0px 0px 25px 0px #00000026;
-  position: relative; /* importante para o botão fechar */
+  position: relative;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -46,7 +44,7 @@
   background-color: rgba(255, 255, 255, 0);
   background-size: cover;
   background-repeat: no-repeat;
-  background-image:url(../src/images/close-button.png)
+  background-image: url(../src/images/close-button.png);
 }
 .popup__close-button:hover {
   opacity: 60%;
@@ -98,7 +96,7 @@
   font-size: 12px;
   line-height: 100%;
   letter-spacing: 0;
-  height: 14px; /* para manter espaço mesmo sem texto */
+  height: 14px;
 }
 
 .popup__button {
