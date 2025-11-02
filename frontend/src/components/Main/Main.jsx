@@ -1,5 +1,4 @@
 import { useContext } from 'react';
-import Popup from './components/Popup/Popup';
 import NewCard from './components/Popup/NewCard/NewCard';
 import EditProfile from './components/Popup/EditProfile/EditProfile';
 import EditAvatar from './components/Popup/EditAvatar/EditAvatar';
@@ -10,7 +9,6 @@ import ImagePopup from './components/Popup/ImagePopup/ImagePopup';
 import CurrentUserContext from '../../contexts/CurrentUserContext';
 
 export default function Main({
-  popup,
   onOpenPopup,
   onClosePopup,
   onCardLike,
@@ -94,12 +92,6 @@ export default function Main({
           ))}
         </ul>
       </section>
-
-      {popup && (
-        <Popup onClose={onClosePopup} title={popup.title}>
-          {popup.children}
-        </Popup>
-      )}
     </>
   );
 }

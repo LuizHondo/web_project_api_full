@@ -1,35 +1,45 @@
 {
-  "name": "web_project_around_express",
+  "name": "web_project_around_backend",
   "version": "1.0.0",
+  "description": "Backend API for Around the U.S. (TripleTen Sprint Project)",
   "type": "module",
-  "description": "TT-sprint15project",
   "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "lint": "npx eslint .",
-    "start": "node app.js",
-    "dev": "nodemon app.js"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/LuizHondo/web_project_around_express.git"
+    "start": "cross-env PORT=3001 node app.js",
+    "dev": "cross-env PORT=3001 nodemon app.js",
+    "lint": "eslint . --ext .js",
+    "test": "cross-env NODE_OPTIONS=--experimental-vm-modules jest --runInBand",
+    "test:watch": "cross-env NODE_OPTIONS=--experimental-vm-modules jest --watch"
   },
   "author": "Luiz Paulo Hondo",
   "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/LuizHondo/web_project_api_full.git"
+  },
   "bugs": {
-    "url": "https://github.com/LuizHondo/web_project_around_express/issues"
+    "url": "https://github.com/LuizHondo/web_project_api_full/issues"
   },
-  "homepage": "https://github.com/LuizHondo/web_project_around_express#readme",
-  "devDependencies": {
-    "eslint": "^8.56.0",
-    "eslint-config-airbnb-base": "^15.0.0",
-    "eslint-plugin-import": "^2.32.0",
-    "nodemon": "^3.1.10"
-  },
+  "homepage": "https://github.com/LuizHondo/web_project_api_full#readme",
   "dependencies": {
     "bcryptjs": "^3.0.2",
+    "celebrate": "^15.0.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
     "express": "^5.1.0",
+    "helmet": "^7.2.0",
     "jsonwebtoken": "^9.0.2",
-    "mongoose": "^8.18.2"
+    "mongoose": "^8.18.2",
+    "winston": "^3.13.0"
+  },
+  "devDependencies": {
+    "cross-env": "^7.0.3",
+    "eslint": "^8.57.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-plugin-import": "^2.32.0",
+    "jest": "^29.7.0",
+    "mongodb-memory-server": "^10.1.4",
+    "nodemon": "^3.1.10",
+    "supertest": "^7.1.4"
   }
 }

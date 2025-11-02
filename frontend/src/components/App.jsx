@@ -6,10 +6,12 @@ import Main from './Main/Main.jsx';
 import Login from './Login.jsx';
 import Register from './Register.jsx';
 import ProtectedRoute from './ProtectedRoute.jsx';
-import InfoTooltip from './InfoTooltip.jsx';
+import Popup from './Popup/Popup.jsx';
 import api from '../utils/api.js';
 import * as auth from '../utils/auth.js';
 import CurrentUserContext from '../contexts/CurrentUserContext.js';
+import successIcon from '../images/success-icon.svg';
+import errorIcon from '../images/error-icon.svg';
 
 export default function App() {
   const [currentUser, setCurrentUser] = useState({});
@@ -17,8 +19,6 @@ export default function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [cards, setCards] = useState([]);
   const [email, setEmail] = useState('');
-  const [isInfoTooltipOpen, setIsInfoTooltipOpen] = useState(false);
-  const [tooltipStatus, setTooltipStatus] = useState('');
 
   useEffect(() => {
     const token = localStorage.getItem('jwt');
@@ -82,16 +82,35 @@ export default function App() {
       });
   };
 
+  const showInfoPopup = (status) => {
+    const isSuccess = status === 'success';
+    handleOpenPopup({
+      title: null,
+      children: (
+        <>
+          <img
+            className="popup__icon"
+            src={isSuccess ? successIcon : errorIcon}
+            alt={isSuccess ? 'Success' : 'Error'}
+          />
+          <h2 className="popup__title">
+            {isSuccess
+              ? 'Success! You have been registered.'
+              : 'Oops, something went wrong. Please try again.'}
+          </h2>
+        </>
+      ),
+    });
+  };
+
   const handleRegister = (userEmail, password) => {
     return auth.register(userEmail, password)
       .then(() => {
-        setTooltipStatus('success');
-        setIsInfoTooltipOpen(true);
+        showInfoPopup('success');
       })
       .catch((err) => {
         console.error('Registration error:', err);
-        setTooltipStatus('error');
-        setIsInfoTooltipOpen(true);
+        showInfoPopup('error');
         throw err;
       });
   };
@@ -184,7 +203,6 @@ export default function App() {
                 <Main
                   onOpenPopup={handleOpenPopup}
                   onClosePopup={handleClosePopup}
-                  popup={popup}
                   onCardLike={handleCardLike}
                   onCardDelete={handleCardDelete}
                   cards={cards}
@@ -202,8 +220,6 @@ export default function App() {
                 : (
                   <Login
                     onLogin={handleLogin}
-                    popup={popup}
-                    onClosePopup={handleClosePopup}
                   />
                 )
             }
@@ -217,8 +233,6 @@ export default function App() {
                 : (
                   <Register
                     onRegister={handleRegister}
-                    popup={popup}
-                    onClosePopup={handleClosePopup}
                   />
                 )
             }
@@ -236,11 +250,11 @@ export default function App() {
 
         <Footer />
 
-        <InfoTooltip
-          isOpen={isInfoTooltipOpen}
-          onClose={() => setIsInfoTooltipOpen(false)}
-          status={tooltipStatus}
-        />
+        {popup && (
+          <Popup onClose={handleClosePopup} title={popup.title}>
+            {popup.children}
+          </Popup>
+        )}
       </div>
     </CurrentUserContext.Provider>
   );
