@@ -12,5 +12,4 @@
 @import url(../blocks/popup-avatar.css);
 @import url(../blocks/login.css);
 @import url(../blocks/register.css);
-@import url('../blocks/login-status-popup/login-status-popup.css');
-
+@import url(../blocks/login-status-popup.css);
