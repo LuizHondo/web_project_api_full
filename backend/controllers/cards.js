@@ -1,10 +1,10 @@
-const Card = require('../models/card');
-const { logger } = require('../middleware/logger');
-const BadRequestError = require('../errors/BadRequestError');
-const NotFoundError = require('../errors/NotFoundError');
-const ForbiddenError = require('../errors/ForbiddenError');
+import Card from '../models/card.js';
+import { logger } from '../middleware/logger.js';
+import BadRequestError from '../errors/BadRequestError.js';
+import NotFoundError from '../errors/NotFoundError.js';
+import ForbiddenError from '../errors/ForbiddenError.js';
 
-module.exports.getAllCards = (req, res, next) => {
+export const getAllCards = (req, res, next) => {
   Card.find({})
     .sort({ createdAt: -1 })
     .then((cards) => {
@@ -17,7 +17,7 @@ module.exports.getAllCards = (req, res, next) => {
     });
 };
 
-module.exports.getCards = (req, res, next) => {
+export const getCards = (req, res, next) => {
   const { owner } = req.query;
   const filter = owner ? { owner } : {};
 
@@ -37,7 +37,7 @@ module.exports.getCards = (req, res, next) => {
     });
 };
 
-module.exports.getCardById = (req, res, next) => {
+export const getCardById = (req, res, next) => {
   Card.findById(req.params.id)
     .orFail(() => new NotFoundError('Card not found.'))
     .then((card) => {
@@ -54,7 +54,7 @@ module.exports.getCardById = (req, res, next) => {
     });
 };
 
-module.exports.createCard = (req, res, next) => {
+export const createCard = (req, res, next) => {
   const { name, link } = req.body;
   const owner = req.user._id;
   Card.create({ name, link, owner })
@@ -72,7 +72,7 @@ module.exports.createCard = (req, res, next) => {
     });
 };
 
-module.exports.deleteCard = (req, res, next) => {
+export const deleteCard = (req, res, next) => {
   Card.findById(req.params.id)
     .orFail(() => new NotFoundError('Card not found.'))
     .then((card) => {
@@ -99,7 +99,7 @@ module.exports.deleteCard = (req, res, next) => {
     });
 };
 
-module.exports.likeCard = (req, res, next) => {
+export const likeCard = (req, res, next) => {
   Card.findByIdAndUpdate(
     req.params.id,
     { $addToSet: { likes: req.user._id } },
@@ -123,7 +123,7 @@ module.exports.likeCard = (req, res, next) => {
     });
 };
 
-module.exports.dislikeCard = (req, res, next) => {
+export const dislikeCard = (req, res, next) => {
   Card.findByIdAndUpdate(
     req.params.id,
     { $pull: { likes: req.user._id } },

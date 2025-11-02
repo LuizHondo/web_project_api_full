@@ -1,13 +1,13 @@
-const express = require('express');
-const mongoose = require('mongoose');
-const { errors } = require('celebrate');
-const cors = require('cors');
+import express from 'express';
+import mongoose from 'mongoose';
+import { errors } from 'celebrate';
+import cors from 'cors';
 
-const usersRouter = require('./routes/users');
-const cardsRouter = require('./routes/cards');
-const usersController = require('./controllers/users');
-const { requestLogger, errorLogger } = require('./middleware/logger');
-const auth = require('./middleware/auth');
+import usersRouter from './routes/users.js';
+import cardsRouter from './routes/cards.js';
+import { login, createUser } from './controllers/users.js';
+import { requestLogger, errorLogger } from './middleware/logger.js';
+import auth from './middleware/auth.js';
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -27,8 +27,8 @@ app.get('/crash-test', () => {
   }, 0);
 });
 
-app.post('/signin', usersController.login);
-app.post('/signup', usersController.createUser);
+app.post('/signin', login);
+app.post('/signup', createUser);
 
 app.use(auth);
 
@@ -56,3 +56,5 @@ app.use((err, req, res, next) => {
 app.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}`);
 });
+
+export default app;

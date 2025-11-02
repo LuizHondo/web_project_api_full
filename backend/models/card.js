@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const urlRegex = /^https?:\/\/(www\.)?[\w\-._~:\/?%#[\]@!$&'()*+,;=]+#?$/;
 
@@ -33,4 +33,6 @@ const cardSchema = new mongoose.Schema({
   }],
 });
 
-module.exports = mongoose.model('card', cardSchema);
+const Card = mongoose.model('card', cardSchema);
+
+export default Card;

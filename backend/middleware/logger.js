@@ -1,5 +1,5 @@
-const winston = require('winston');
-const expressWinston = require('express-winston');
+import winston from 'winston';
+import expressWinston from 'express-winston';
 
 const sanitizeHeaders = (req) => {
   const headers = { ...req.headers };
@@ -8,7 +8,7 @@ const sanitizeHeaders = (req) => {
   return headers;
 };
 
-const requestLogger = expressWinston.logger({
+export const requestLogger = expressWinston.logger({
   transports: [
     new winston.transports.File({ filename: 'logs/request.log' }),
     ...(process.env.NODE_ENV !== 'production'
@@ -17,9 +17,9 @@ const requestLogger = expressWinston.logger({
   ],
   format: winston.format.combine(
     winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
-    winston.format.printf(({ level, message, meta, timestamp }) => {
-      return `${timestamp} [${level.toUpperCase()}]: ${message} ${meta ? JSON.stringify(meta) : ''}`;
-    }),
+    winston.format.printf(({ level, message, meta, timestamp }) => (
+      `${timestamp} [${level.toUpperCase()}]: ${message} ${meta ? JSON.stringify(meta) : ''}`
+    )),
   ),
   ignoreRoute: (req) => req.method === 'OPTIONS',
   meta: true,
@@ -32,7 +32,7 @@ const requestLogger = expressWinston.logger({
   },
 });
 
-const errorLogger = expressWinston.errorLogger({
+export const errorLogger = expressWinston.errorLogger({
   transports: [
     new winston.transports.File({ filename: 'logs/error.log' }),
     ...(process.env.NODE_ENV !== 'production'
@@ -49,13 +49,13 @@ const errorLogger = expressWinston.errorLogger({
   },
 });
 
-const logger = winston.createLogger({
+export const logger = winston.createLogger({
   level: 'info',
   format: winston.format.combine(
     winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
-    winston.format.printf(({ level, message, timestamp }) => {
-      return `${timestamp} [${level.toUpperCase()}]: ${message}`;
-    }),
+    winston.format.printf(({ level, message, timestamp }) => (
+      `${timestamp} [${level.toUpperCase()}]: ${message}`
+    )),
   ),
   transports: [
     new winston.transports.File({ filename: 'logs/combined.log' }),
@@ -65,4 +65,4 @@ const logger = winston.createLogger({
   ],
 });
 
-module.exports = { requestLogger, errorLogger, logger };
+export default logger;

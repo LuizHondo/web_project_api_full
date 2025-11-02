@@ -1,13 +1,14 @@
-const User = require('../models/user');
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
-const { logger } = require('../middleware/logger');
-const UnauthorizedError = require('../errors/UnauthorizedError');
-const BadRequestError = require('../errors/BadRequestError');
-const NotFoundError = require('../errors/NotFoundError');
-const ConflictError = require('../errors/ConflictError');
+import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
 
-module.exports.login = async (req, res, next) => {
+import User from '../models/user.js';
+import { logger } from '../middleware/logger.js';
+import UnauthorizedError from '../errors/UnauthorizedError.js';
+import BadRequestError from '../errors/BadRequestError.js';
+import NotFoundError from '../errors/NotFoundError.js';
+import ConflictError from '../errors/ConflictError.js';
+
+export const login = async (req, res, next) => {
   try {
     const { email, password } = req.body;
     const user = await User.findOne({ email }).select('+password');
@@ -20,10 +21,9 @@ module.exports.login = async (req, res, next) => {
       logger.warn(`Incorrect password for email: ${email}`);
       throw new UnauthorizedError('Invalid email or password.');
     }
-    const secretKey =
-      process.env.NODE_ENV === 'production'
-        ? process.env.JWT_SECRET
-        : 'dev-secret-key';
+    const secretKey = process.env.NODE_ENV === 'production'
+      ? process.env.JWT_SECRET
+      : 'dev-secret-key';
     const token = jwt.sign({ _id: user._id }, secretKey, { expiresIn: '7d' });
     logger.info(`User logged in successfully: ${email}`);
     res.send({ token });
@@ -33,7 +33,7 @@ module.exports.login = async (req, res, next) => {
   }
 };
 
-module.exports.getAllUsers = async (req, res, next) => {
+export const getAllUsers = async (req, res, next) => {
   try {
     const users = await User.find({});
     logger.info(`Successfully retrieved ${users.length} users.`);
@@ -44,7 +44,7 @@ module.exports.getAllUsers = async (req, res, next) => {
   }
 };
 
-module.exports.getCurrentUser = async (req, res, next) => {
+export const getCurrentUser = async (req, res, next) => {
   try {
     const user = await User.findById(req.user._id);
     if (!user) {
@@ -62,7 +62,7 @@ module.exports.getCurrentUser = async (req, res, next) => {
   }
 };
 
-module.exports.getUserById = async (req, res, next) => {
+export const getUserById = async (req, res, next) => {
   try {
     const user = await User.findById(req.params.id);
     if (!user) {
@@ -80,7 +80,7 @@ module.exports.getUserById = async (req, res, next) => {
   }
 };
 
-module.exports.createUser = async (req, res, next) => {
+export const createUser = async (req, res, next) => {
   try {
     const { name, about, avatar, email, password } = req.body;
     const existingUser = await User.findOne({ email });
@@ -115,13 +115,13 @@ module.exports.createUser = async (req, res, next) => {
   }
 };
 
-module.exports.updateUser = async (req, res, next) => {
+export const updateUser = async (req, res, next) => {
   try {
     const { name, about } = req.body;
     const updatedUser = await User.findByIdAndUpdate(
       req.user._id,
       { name, about },
-      { new: true, runValidators: true }
+      { new: true, runValidators: true },
     );
     if (!updatedUser) {
       throw new NotFoundError('User not found.');
@@ -138,13 +138,13 @@ module.exports.updateUser = async (req, res, next) => {
   }
 };
 
-module.exports.updateUserAvatar = async (req, res, next) => {
+export const updateUserAvatar = async (req, res, next) => {
   try {
     const { avatar } = req.body;
     const updatedUserAvatar = await User.findByIdAndUpdate(
       req.user._id,
       { avatar },
-      { new: true, runValidators: true }
+      { new: true, runValidators: true },
     );
     if (!updatedUserAvatar) {
       throw new NotFoundError('User not found.');

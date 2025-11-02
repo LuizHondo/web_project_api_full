@@ -1,44 +1,37 @@
-const express = require('express');
-const usersController = require('../controllers/users');
-const auth = require('../middleware/auth')
-const { celebrate, Joi } = require('celebrate');
+import express from 'express';
+import { celebrate, Joi } from 'celebrate';
+
+import {
+  getAllUsers,
+  getUserById,
+  getCurrentUser,
+  updateUser,
+  updateUserAvatar,
+} from '../controllers/users.js';
 
 const router = express.Router();
 
-router.post('/signin', celebrate({
-  body: Joi.object().keys({
-    email: Joi.string().email().required(),
-    password: Joi.string().min(8).required(),
-  }),
-}), usersController.login);
-router.post('/signup', celebrate({
-  body: Joi.object().keys({
-    name: Joi.string().min(2).max(30).required(),
-    about: Joi.string().min(2).max(30).required(),
-    avatar: Joi.string().uri().required(),
-    email: Joi.string().email().required(),
-    password: Joi.string().min(8).required(),
-  }),
-}), usersController.createUser);
+router.get('/', getAllUsers);
 
-router.use(auth);
+router.get('/me', getCurrentUser);
 
-router.get('/me', usersController.getCurrentUser);
-router.get('/:id',celebrate({
+router.get('/:id', celebrate({
   params: Joi.object().keys({
     id: Joi.string().hex().length(24).required(),
   }),
-}), usersController.getUserById);
-router.patch('/me',celebrate({
+}), getUserById);
+
+router.patch('/me', celebrate({
   body: Joi.object().keys({
     name: Joi.string().min(2).max(30).required(),
     about: Joi.string().min(2).max(30).required(),
   }),
-}), usersController.updateUser);
+}), updateUser);
+
 router.patch('/me/avatar', celebrate({
   body: Joi.object().keys({
     avatar: Joi.string().uri().required(),
   }),
-}), usersController.updateUserAvatar);
+}), updateUserAvatar);
 
-module.exports = router;
+export default router;
