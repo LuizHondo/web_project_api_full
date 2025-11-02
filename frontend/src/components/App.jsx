@@ -44,7 +44,13 @@ export default function App() {
       Promise.all([api.getUserInfo(), api.getInitialCards()])
         .then(([userData, cardsData]) => {
           setCurrentUser(userData);
-          setCards(cardsData);
+          const normalizedCards = (cardsData || []).map((card) => ({
+            ...card,
+            isLiked: Array.isArray(card.likes)
+              ? card.likes.some((id) => String(id) === String(userData._id))
+              : Boolean(card.isLiked)
+          }));
+          setCards(normalizedCards);
         })
         .catch((err) => console.error(err));
     }
@@ -115,14 +121,17 @@ export default function App() {
   };
 
   const handleCardLike = (card) => {
-    const isLiked = card.isLiked;
-    
+    const isLiked = Boolean(card.isLiked);
     return api.toggleLike(card._id, isLiked)
-      .then((newCard) => {
-        setCards((state) => 
-          state.map((currentCard) => 
-            currentCard._id === card._id ? newCard : currentCard
-          )
+      .then((updated) => {
+        const newCard = {
+          ...updated,
+          isLiked: Array.isArray(updated.likes)
+            ? updated.likes.some((id) => String(id) === String(currentUser._id))
+            : Boolean(updated.isLiked)
+        };
+        setCards((state) =>
+          state.map((c) => (c._id === card._id ? newCard : c))
         );
       })
       .catch((err) => console.error(err));
@@ -138,8 +147,14 @@ export default function App() {
 
   const handleAddPlaceSubmit = (data) => {
     return api.addCard(data)
-      .then((newCard) => {
-        setCards([newCard, ...cards]);
+      .then((created) => {
+        const newCard = {
+          ...created,
+          isLiked: Array.isArray(created.likes)
+            ? created.likes.some((id) => String(id) === String(currentUser._id))
+            : false
+        };
+        setCards((state) => [newCard, ...state]);
         handleClosePopup();
       })
       .catch((err) => console.error(err));

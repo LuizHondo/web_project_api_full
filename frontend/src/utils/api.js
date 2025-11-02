@@ -1,7 +1,6 @@
 class Api {
   constructor(options) {
     this._baseUrl = options.baseUrl;
-    this._headers = options.headers;
   }
 
   _handleResponse(res) {
@@ -11,75 +10,79 @@ class Api {
     return Promise.reject(`Erro: ${res.status}`);
   }
 
-  /////// PEGA USER
+  _getHeaders() {
+    const token = localStorage.getItem('jwt');
+    return {
+      'Content-Type': 'application/json',
+      Authorization: token ? `Bearer ${token}` : ''
+    };
+  }
+
+  // USER
   getUserInfo() {
     return fetch(`${this._baseUrl}/users/me`, {
-      headers: this._headers
+      headers: this._getHeaders()
     }).then(this._handleResponse);
   }
-  //////// PEGA INITIAL CARDS
+
+  // INITIAL CARDS
   getInitialCards() {
     return fetch(`${this._baseUrl}/cards`, {
-      headers: this._headers
+      headers: this._getHeaders()
     }).then(this._handleResponse);
   }
-  ///// ATUALIZA NOME E DESCRIÇÃO
+
+  // UPDATE NAME AND ABOUT
   updateProfile(data) {
     return fetch(`${this._baseUrl}/users/me`, {
-      method: "PATCH",
-      headers: this._headers,
+      method: 'PATCH',
+      headers: this._getHeaders(),
       body: JSON.stringify({
         name: data.name,
         about: data.about
       })
     }).then(this._handleResponse);
   }
-  //// ATUALIZA AVATAR
+
+  // UPDATE AVATAR
   updateAvatar(avatarUrl) {
     return fetch(`${this._baseUrl}/users/me/avatar`, {
-      method: "PATCH",
-      headers: this._headers,
+      method: 'PATCH',
+      headers: this._getHeaders(),
       body: JSON.stringify({ avatar: avatarUrl })
     }).then(this._handleResponse);
   }
-  //////////////////////////////////
-  ///////////////////CARDS
-  /////////////// ADICIONAR CARD
+
+  // CARDS
   addCard(data) {
     return fetch(`${this._baseUrl}/cards`, {
-      method: "POST",
-      headers: this._headers,
+      method: 'POST',
+      headers: this._getHeaders(),
       body: JSON.stringify({
         name: data.name,
         link: data.link
       })
     }).then(this._handleResponse);
   }
-  //////// REMOVER CARD
+
   deleteCard(cardId) {
     return fetch(`${this._baseUrl}/cards/${cardId}`, {
-      method: "DELETE",
-      headers: this._headers
+      method: 'DELETE',
+      headers: this._getHeaders()
     }).then(this._handleResponse);
   }
-  //////// CURTIR
+
   toggleLike(cardId, isLiked) {
     return fetch(`${this._baseUrl}/cards/${cardId}/likes`, {
-      method: isLiked ? "DELETE" : "PUT",
-      headers: this._headers
+      method: isLiked ? 'DELETE' : 'PUT',
+      headers: this._getHeaders()
     }).then(this._handleResponse);
   }
-
-
 }
 
 const api = new Api({
-baseUrl: "https://around-api.pt-br.tripleten-services.com/v1",
-headers: {
-  authorization: "4fe3b6e2-c8d9-4e4d-8a1e-c00cea17e8fc",
-  "Content-Type": "application/json"
-      } 
-  }
-)
+  baseUrl: 'http://localhost:3001'
+});
 
 export default api;
+

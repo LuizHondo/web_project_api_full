@@ -6,6 +6,7 @@ const ForbiddenError = require('../errors/ForbiddenError');
 
 module.exports.getAllCards = (req, res, next) => {
   Card.find({})
+    .sort({ createdAt: -1 })
     .then((cards) => {
       logger.info(`Returned ${cards.length} cards.`);
       res.json(cards);
@@ -17,13 +18,21 @@ module.exports.getAllCards = (req, res, next) => {
 };
 
 module.exports.getCards = (req, res, next) => {
-  Card.find({ owner: req.user._id })
+  const { owner } = req.query;
+  const filter = owner ? { owner } : {};
+
+  Card.find(filter)
+    .sort({ createdAt: -1 })
     .then((cards) => {
-      logger.info(`User ${req.user._id} retrieved ${cards.length} cards.`);
+      if (owner) {
+        logger.info(`User ${req.user._id} retrieved ${cards.length} cards for owner ${owner}.`);
+      } else {
+        logger.info(`User ${req.user._id} retrieved ${cards.length} cards.`);
+      }
       res.json(cards);
     })
     .catch((err) => {
-      logger.error(`Error retrieving user cards for ${req.user._id}: ${err.message}`);
+      logger.error(`Error retrieving cards for ${req.user._id}: ${err.message}`);
       next(err);
     });
 };
