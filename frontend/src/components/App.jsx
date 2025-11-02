@@ -7,11 +7,10 @@ import Login from './Login.jsx';
 import Register from './Register.jsx';
 import ProtectedRoute from './ProtectedRoute.jsx';
 import Popup from './Popup/Popup.jsx';
+import LoginStatusPopup from './LoginStatusPopup.jsx';
 import api from '../utils/api.js';
 import * as auth from '../utils/auth.js';
 import CurrentUserContext from '../contexts/CurrentUserContext.js';
-import successIcon from '../images/success-icon.svg';
-import errorIcon from '../images/error-icon.svg';
 
 export default function App() {
   const [currentUser, setCurrentUser] = useState({});
@@ -66,6 +65,15 @@ export default function App() {
     setPopup(null);
   };
 
+  const showInfoPopup = (status, customMessage) => {
+    handleOpenPopup({
+      title: null,
+      children: (
+        <LoginStatusPopup status={status} message={customMessage} />
+      ),
+    });
+  };
+
   const handleLogin = (userEmail, password) => {
     return auth.authorize(userEmail, password)
       .then((data) => {
@@ -78,39 +86,21 @@ export default function App() {
       })
       .catch((err) => {
         console.error('Login error:', err);
+        showInfoPopup('error', 'Invalid email or password.');
         throw err;
       });
-  };
-
-  const showInfoPopup = (status) => {
-    const isSuccess = status === 'success';
-    handleOpenPopup({
-      title: null,
-      children: (
-        <>
-          <img
-            className="popup__icon"
-            src={isSuccess ? successIcon : errorIcon}
-            alt={isSuccess ? 'Success' : 'Error'}
-          />
-          <h2 className="popup__title">
-            {isSuccess
-              ? 'Success! You have been registered.'
-              : 'Oops, something went wrong. Please try again.'}
-          </h2>
-        </>
-      ),
-    });
   };
 
   const handleRegister = (userEmail, password) => {
     return auth.register(userEmail, password)
       .then(() => {
-        showInfoPopup('success');
+        
       })
       .catch((err) => {
         console.error('Registration error:', err);
-        showInfoPopup('error');
+        showInfoPopup('error', err?.message === 'Email already in use.'
+          ? 'Email is already registered. Try signing in instead.'
+          : 'Oops, something went wrong. Please try again.');
         throw err;
       });
   };
@@ -259,3 +249,7 @@ export default function App() {
     </CurrentUserContext.Provider>
   );
 }
+
+
+
+
