@@ -12,7 +12,7 @@
     "dev:back": "npm run dev -w backend",
     "build": "npm run build -w frontend",
     "lint": "npm run lint -w frontend && npm run lint -w backend",
-    "start": "npm run start -w backend",
+    "start": "concurrently -n front,back -c auto \"npm:dev -w frontend\" \"npm:start -w backend\"",
     "test": "npm run test -w backend"
   },
   "devDependencies": {
