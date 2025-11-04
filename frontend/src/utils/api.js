@@ -75,8 +75,9 @@ class Api {
   }
 }
 
+// Prefer env var; fallback to '/api' for production behind Nginx
 const api = new Api({
-  baseUrl: 'http://localhost:3001',
+  baseUrl: import.meta.env.VITE_API_BASE_URL || '/api',
 });
 
 export default api;

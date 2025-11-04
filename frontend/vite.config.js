@@ -7,5 +7,14 @@ export default defineConfig({
   server: {
     port: 3000,
     strictPort: true,
+    // Proxy API calls during development to the backend
+    proxy: {
+      '/api': {
+        target: 'http://localhost:3001',
+        changeOrigin: true,
+        // Remove '/api' prefix when forwarding to the backend
+        rewrite: (path) => path.replace(/^\/api/, ''),
+      },
+    },
   },
 })

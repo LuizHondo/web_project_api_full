@@ -1,7 +1,9 @@
+import 'dotenv/config';
 import express from 'express';
 import mongoose from 'mongoose';
 import { errors } from 'celebrate';
 import cors from 'cors';
+import helmet from 'helmet';
 
 import usersRouter from './routes/users.js';
 import cardsRouter from './routes/cards.js';
@@ -14,9 +16,25 @@ const PORT = process.env.PORT || 3001;
 const { MONGODB_URI = 'mongodb://localhost:27017/aroundb' } = process.env;
 
 app.use(express.json());
-app.use(cors());
+app.use(helmet());
+app.set('trust proxy', 1);
+// Restrict CORS to trusted origins
+const corsOptions = {
+  origin: [
+    'https://luizhondo.com',
+    'http://localhost:3000',
+  ],
+  methods: ['GET', 'POST', 'PATCH', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+};
+app.use(cors(corsOptions));
 
 app.use(requestLogger);
+
+// Lightweight healthcheck (no auth)
+app.get('/health', (req, res) => {
+  res.status(200).send({ status: 'ok' });
+});
 
 app.get('/crash-test', () => {
   setTimeout(() => {
