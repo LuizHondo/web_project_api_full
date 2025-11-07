@@ -7,7 +7,7 @@ import jwt from 'jsonwebtoken';const auth = (req, res, next) => {
 
   const token = authorization.replace('Bearer ', '');
 
-  try {const secretKey = JWT_SECRET;
+  try {const secretKey = process.env.NODE_ENV === 'production' ? process.env.JWT_SECRET : 'dev-secret-key';
 
     const payload = jwt.verify(token, secretKey);
 
