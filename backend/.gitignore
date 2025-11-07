@@ -1,4 +1,6 @@
 combined.log
 logs/
 todo
-
+.env
+node_modules
+env

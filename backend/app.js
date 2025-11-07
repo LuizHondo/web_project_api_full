@@ -1,19 +1,21 @@
 import fs from 'fs';
 import path from 'path';
 import dotenv from 'dotenv';
+import { fileURLToPath } from 'url';
 
 // Load .env if present; fall back to .env.example in non-production to avoid crashes
-const cwd = process.cwd();
-const envFile = fs.existsSync(path.join(cwd, '.env'))
-  ? path.join(cwd, '.env')
-  : (process.env.NODE_ENV !== 'production' && fs.existsSync(path.join(cwd, '.env.example'))
-    ? path.join(cwd, '.env.example')
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const envFile = fs.existsSync(path.join(__dirname, '.env'))
+  ? path.join(__dirname, '.env')
+  : (process.env.NODE_ENV !== 'production' && fs.existsSync(path.join(__dirname, '.env.example'))
+    ? path.join(__dirname, '.env.example')
     : null);
 if (envFile) {
   dotenv.config({ path: envFile });
 } else {
   dotenv.config();
-}import express from 'express';
+}
+import express from 'express';
 import mongoose from 'mongoose';
 import { errors } from 'celebrate';
 import cors from 'cors';
