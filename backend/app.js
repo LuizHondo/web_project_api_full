@@ -1,5 +1,19 @@
-import 'dotenv/config';
-import express from 'express';
+import fs from 'fs';
+import path from 'path';
+import dotenv from 'dotenv';
+
+// Load .env if present; fall back to .env.example in non-production to avoid crashes
+const cwd = process.cwd();
+const envFile = fs.existsSync(path.join(cwd, '.env'))
+  ? path.join(cwd, '.env')
+  : (process.env.NODE_ENV !== 'production' && fs.existsSync(path.join(cwd, '.env.example'))
+    ? path.join(cwd, '.env.example')
+    : null);
+if (envFile) {
+  dotenv.config({ path: envFile });
+} else {
+  dotenv.config();
+}import express from 'express';
 import mongoose from 'mongoose';
 import { errors } from 'celebrate';
 import cors from 'cors';
@@ -18,7 +32,6 @@ const { MONGODB_URI = 'mongodb://localhost:27017/aroundb' } = process.env;
 app.use(express.json());
 app.use(helmet());
 app.set('trust proxy', 1);
-// Restrict CORS to trusted origins
 const corsOptions = {
   origin: [
     'https://luizhondo.com',
@@ -31,7 +44,6 @@ app.use(cors(corsOptions));
 
 app.use(requestLogger);
 
-// Lightweight healthcheck (no auth)
 app.get('/health', (req, res) => {
   res.status(200).send({ status: 'ok' });
 });
