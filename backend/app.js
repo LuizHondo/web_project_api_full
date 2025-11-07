@@ -7,8 +7,8 @@ import { fileURLToPath } from 'url';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const envFile = fs.existsSync(path.join(__dirname, '.env'))
   ? path.join(__dirname, '.env')
-  : (process.env.NODE_ENV !== 'production' && fs.existsSync(path.join(__dirname, '.env.example'))
-    ? path.join(__dirname, '.env.example')
+  : (process.env.NODE_ENV !== 'production' && fs.existsSync(path.join(__dirname, '.env'))
+    ? path.join(__dirname, '.env')
     : null);
 if (envFile) {
   dotenv.config({ path: envFile });
@@ -28,7 +28,7 @@ import { requestLogger, errorLogger } from './middleware/logger.js';
 import auth from './middleware/auth.js';
 
 const app = express();
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT;
 const { MONGODB_URI = 'mongodb://localhost:27017/aroundb' } = process.env;
 
 app.use(express.json());
@@ -36,6 +36,7 @@ app.use(helmet());
 app.set('trust proxy', 1);
 const corsOptions = {
   origin: [
+    'https://www.luizhondo.com',
     'https://luizhondo.com',
     'http://localhost:3000',
   ],

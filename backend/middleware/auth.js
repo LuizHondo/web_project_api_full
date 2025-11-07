@@ -7,8 +7,11 @@ import jwt from 'jsonwebtoken';const auth = (req, res, next) => {
 
   const token = authorization.replace('Bearer ', '');
 
-  try {const secretKey = process.env.NODE_ENV === 'production' ? process.env.JWT_SECRET : 'dev-secret-key';
-
+  try {
+    const secretKey = process.env.JWT_SECRET;
+    if (!secretKey) {
+    throw new Error('JWT secret key is not defined');
+    }
     const payload = jwt.verify(token, secretKey);
 
     req.user = payload;
