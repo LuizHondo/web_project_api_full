@@ -1,7 +1,0 @@
-*** Begin Patch
-*** Add File: backend/.env.example
-+NODE_ENV=
-+JWT_SECRET=
-+MONGODB_URI=
-+PORT=
-*** End Patch
