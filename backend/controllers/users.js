@@ -21,9 +21,8 @@ export const login = async (req, res, next) => {
       logger.warn(`Incorrect password for email: ${email}`);
       throw new UnauthorizedError('Invalid email or password.');
     }
-    const secretKey = process.env.NODE_ENV === 'production'
-      ? process.env.JWT_SECRET
-      : 'dev-secret-key';
+    import { JWT_SECRET } from '../config/config.js';
+    const secretKey = JWT_SECRET;
     const token = jwt.sign({ _id: user._id }, secretKey, { expiresIn: '7d' });
     logger.info(`User logged in successfully: ${email}`);
     res.send({ token });
