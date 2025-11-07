@@ -1,6 +1,5 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import { JWT_SECRET } from '../config/config.js';
 import User from '../models/user.js';
 import { logger } from '../middleware/logger.js';
 import UnauthorizedError from '../errors/UnauthorizedError.js';
@@ -21,7 +20,7 @@ export const login = async (req, res, next) => {
       logger.warn(`Incorrect password for email: ${email}`);
       throw new UnauthorizedError('Invalid email or password.');
     }
-    const secretKey = JWT_SECRET;
+    const secretKey = process.env.NODE_ENV === 'production' ? process.env.JWT_SECRET : 'dev-secret-key';
     const token = jwt.sign({ _id: user._id }, secretKey, { expiresIn: '7d' });
     logger.info(`User logged in successfully: ${email}`);
     res.send({ token });
