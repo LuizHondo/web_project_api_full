@@ -1,15 +1,18 @@
-# Around the U.S. ó Full-Stack (Frontend + Backend)
+Ôªø# Around the U.S. ‚Äî Full‚ÄëStack (Frontend + Backend)
 
-Full-stack implementation of ìAround the U.S.î (TripleTen) with a RESTful Node.js/Express API (MongoDB) and a React (Vite) frontend.
+Full‚Äëstack implementation of ‚ÄúAround the U.S.‚Äù (TripleTen) with a RESTful Node.js/Express API (MongoDB) and a React (Vite) frontend.
 
-## Overview
+## Stack
 - Backend: Express 5, Mongoose 8, JWT auth, Celebrate/Joi validation, Winston logging, Helmet, CORS
 - Frontend: React 19 (Vite), React Router
 - Tests: Jest + Supertest (backend)
 
-## Monorepo Structure
-- `backend/` ó API service (Express)
-- `frontend/` ó SPA (React + Vite)
+## Structure
+```
+web_project_api_full/
+‚îú‚îÄ backend/      # API service (Express)
+‚îî‚îÄ frontend/     # SPA (React + Vite)
+```
 
 ## Requirements
 - Node.js 20+
@@ -17,17 +20,15 @@ Full-stack implementation of ìAround the U.S.î (TripleTen) with a RESTful Node.j
 
 ## Environment Variables
 Create `backend/.env` from `backend/.env.example`:
-
 ```
 PORT=3001
 MONGODB_URI=mongodb://127.0.0.1:27017/aroundb
 JWT_SECRET=replace-with-strong-secret
 NODE_ENV=development
 ```
-
 Notes
-- Do not commit real secrets. `.env` is git-ignored; use `backend/.env.example` as a template.
-- In production, set env vars via your host/PM2; avoid `.env` files.
+- Do not commit real secrets. `.env` is git‚Äëignored; use `backend/.env.example` as a template.
+- In production, set env vars via your host/PM2/process manager (avoid `.env` files).
 
 Frontend (optional) `frontend/.env`:
 ```
@@ -55,15 +56,14 @@ cd frontend
 npm run dev
 ```
 
-Dev behavior
-- Vite proxies `/_api` requests to the backend:
-  - Dev origin: `http://localhost:3000`
-  - Proxy target: `http://localhost:3001`
-  - Path: requests to `/api/*` are forwarded to the backend (with `/api` stripped)
-- If you prefer direct calls, set `VITE_API_BASE_URL` to `http://localhost:3001`.
+Dev proxy (Vite)
+- Dev origin: `http://localhost:3000`
+- Proxy target: `http://localhost:3001`
+- Path: requests to `/api/*` are forwarded to the backend (with `/api` stripped)
+- To call backend directly instead of the proxy, set `VITE_API_BASE_URL=http://localhost:3001`
 
 ## Run (Production)
-Ensure the environment provides and exports:
+Ensure the environment provides:
 - `PORT`
 - `MONGODB_URI`
 - `JWT_SECRET`
@@ -74,37 +74,63 @@ Start the backend:
 cd backend
 npm start
 ```
-(Defaults to port 3001 per `package.json`. Adjust as needed for your host/process manager.)
 
 PM2 example config: `backend/ecosystem.config.js`.
 
+Reverse proxy (example Nginx)
+```
+server {
+  listen 80;
+  server_name luizhondo.com www.luizhondo.com;
+
+  root /var/www/frontend/dist;
+  location / {
+    try_files $uri /index.html;
+  }
+
+  location /api/ {
+    proxy_pass http://127.0.0.1:3001/;   # backend
+    proxy_http_version 1.1;
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+  }
+}
+```
+
+CORS
+- In `backend/app.js`, allowed origins include:
+  - `https://www.luizhondo.com`, `https://luizhondo.com`, and `http://localhost:3000`
+- Adjust this list for your deployment domains as needed.
+
 ## API Summary
 Auth
-- `POST /signin` ó Login, returns JWT
-- `POST /signup` ó Register user
+- `POST /signin` ‚Äî Login, returns JWT
+- `POST /signup` ‚Äî Register user
 
 Users (protected)
-- `GET /users` ó List users
-- `GET /users/me` ó Current user
-- `GET /users/:id` ó Get by ID
-- `PATCH /users/me` ó Update profile
-- `PATCH /users/me/avatar` ó Update avatar
+- `GET /users` ‚Äî List users
+- `GET /users/me` ‚Äî Current user
+- `GET /users/:id` ‚Äî Get by ID
+- `PATCH /users/me` ‚Äî Update profile
+- `PATCH /users/me/avatar` ‚Äî Update avatar
 
 Cards (protected)
-- `GET /cards` ó List cards
-- `GET /cards/:id` ó Get by ID
-- `POST /cards` ó Create
-- `DELETE /cards/:id` ó Delete (owner only)
-- `PUT /cards/:id/likes` ó Like
-- `DELETE /cards/:id/likes` ó Remove like
+- `GET /cards` ‚Äî List cards
+- `GET /cards/:id` ‚Äî Get by ID
+- `POST /cards` ‚Äî Create
+- `DELETE /cards/:id` ‚Äî Delete (owner only)
+- `PUT /cards/:id/likes` ‚Äî Like
+- `DELETE /cards/:id/likes` ‚Äî Remove like
 
 Health & Ops
-- `GET /health` ó Health check (200 OK)
+- `GET /health` ‚Äî Health check (200 OK)
 
-## Security & Hardening
+## Security Notes
 - Helmet enabled; `app.set('trust proxy', 1)` for proxies/load balancers
-- Use strong `JWT_SECRET` in production; rotate regularly
-- Restrict CORS origins to deployed domains (dev allows `http://localhost:3000`)
+- Use a strong `JWT_SECRET` in production; rotate regularly
+- Restrict CORS origins to deployed domains
 - Consider rate limiting for auth endpoints
 
 ## Testing & Linting (Backend)
@@ -115,6 +141,6 @@ npm run lint       # ESLint (Airbnb base)
 ```
 
 ## Troubleshooting
-- Cannot connect to MongoDB: verify `MONGODB_URI` and Mongo service status
-- 401 errors: ensure `Authorization: Bearer <token>` and matching `JWT_SECRET`
-- Port conflicts: frontend uses 3000 (strict), backend uses 3001
+- Mongo connection: verify `MONGODB_URI` and service status
+- 401 responses: ensure `Authorization: Bearer <token>` and matching `JWT_SECRET`
+- Port conflicts: frontend uses 3000; backend uses 3001
