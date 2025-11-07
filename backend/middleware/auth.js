@@ -10,9 +10,8 @@ const auth = (req, res, next) => {
   const token = authorization.replace('Bearer ', '');
 
   try {
-    const secretKey = process.env.NODE_ENV === 'production'
-      ? process.env.JWT_SECRET
-      : 'dev-secret-key';
+    import { JWT_SECRET } from '../config/config.js';
+    const secretKey = JWT_SECRET;
 
     const payload = jwt.verify(token, secretKey);
 
