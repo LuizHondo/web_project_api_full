@@ -1,6 +1,4 @@
-import jwt from 'jsonwebtoken';
-
-const auth = (req, res, next) => {
+import jwt from 'jsonwebtoken';const auth = (req, res, next) => {
   const { authorization } = req.headers;
 
   if (!authorization || !authorization.startsWith('Bearer ')) {
@@ -9,9 +7,7 @@ const auth = (req, res, next) => {
 
   const token = authorization.replace('Bearer ', '');
 
-  try {
-    import { JWT_SECRET } from '../config/config.js';
-    const secretKey = JWT_SECRET;
+  try {const secretKey = JWT_SECRET;
 
     const payload = jwt.verify(token, secretKey);
 
