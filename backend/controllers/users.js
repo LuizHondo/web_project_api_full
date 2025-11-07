@@ -1,7 +1,5 @@
 import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
-
-import User from '../models/user.js';
+import jwt from 'jsonwebtoken';import User from '../models/user.js';
 import { logger } from '../middleware/logger.js';
 import UnauthorizedError from '../errors/UnauthorizedError.js';
 import BadRequestError from '../errors/BadRequestError.js';
@@ -20,9 +18,7 @@ export const login = async (req, res, next) => {
     if (!matched) {
       logger.warn(`Incorrect password for email: ${email}`);
       throw new UnauthorizedError('Invalid email or password.');
-    }
-    import { JWT_SECRET } from '../config/config.js';
-    const secretKey = JWT_SECRET;
+    }const secretKey = JWT_SECRET;
     const token = jwt.sign({ _id: user._id }, secretKey, { expiresIn: '7d' });
     logger.info(`User logged in successfully: ${email}`);
     res.send({ token });
