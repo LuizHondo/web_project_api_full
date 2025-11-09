@@ -28,8 +28,8 @@ import { requestLogger, errorLogger } from './middleware/logger.js';
 import auth from './middleware/auth.js';
 
 const app = express();
-const PORT = process.env.PORT;
-const { MONGODB_URI = 'mongodb://localhost:27017/aroundb' } = process.env;
+const { PORT } = process.env;
+const { MONGODB_URI } = process.env;
 
 app.use(express.json());
 app.use(helmet());
@@ -83,7 +83,7 @@ app.use((err, req, res, next) => {
   });
 });
 
-export const connectDB = (uri = MONGODB_URI) => mongoose.connect(uri);
+export const connectDB = (uri = MONGODB_URI || "aroundb", dbName = process.env.DB_NAME) => mongoose.connect(uri, { dbName });
 
 export const startServer = async () => {
   try {

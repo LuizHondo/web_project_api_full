@@ -22,13 +22,16 @@ web_project_api_full/
 Create `backend/.env` from `backend/.env.example`:
 ```
 PORT=3001
-MONGODB_URI=mongodb://127.0.0.1:27017/aroundb
+# Connection string can omit the DB; app uses DB_NAME
+MONGODB_URI=mongodb://127.0.0.1:27017
+DB_NAME=aroundb
 JWT_SECRET=replace-with-strong-secret
 NODE_ENV=development
 ```
 Notes
-- Do not commit real secrets. `.env` is git‑ignored; use `backend/.env.example` as a template.
+- Do not commit real secrets. `.env` is git-ignored; use `backend/.env.example` as a template.
 - In production, set env vars via your host/PM2/process manager (avoid `.env` files).
+- If your `MONGODB_URI` already includes a database in the path, the app will still use `DB_NAME` (default `aroundb`).
 
 Frontend (optional) `frontend/.env`:
 ```

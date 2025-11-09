@@ -1,4 +1,6 @@
-import jwt from 'jsonwebtoken';const auth = (req, res, next) => {
+import jwt from 'jsonwebtoken';
+
+const auth = (req, res, next) => {
   const { authorization } = req.headers;
 
   if (!authorization || !authorization.startsWith('Bearer ')) {
@@ -10,7 +12,7 @@ import jwt from 'jsonwebtoken';const auth = (req, res, next) => {
   try {
     const secretKey = process.env.JWT_SECRET;
     if (!secretKey) {
-    throw new Error('JWT secret key is not defined');
+      throw new Error('JWT secret key is not defined');
     }
     const payload = jwt.verify(token, secretKey);
 
@@ -20,6 +22,7 @@ import jwt from 'jsonwebtoken';const auth = (req, res, next) => {
   } catch (err) {
     return res.status(401).json({ message: 'Invalid token' });
   }
+  return null;
 };
 
 export default auth;
