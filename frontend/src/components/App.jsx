@@ -94,7 +94,7 @@ export default function App() {
   const handleRegister = (userEmail, password) => {
     return auth.register(userEmail, password)
       .then(() => {
-        
+        showInfoPopup('success', 'Registration successful! You can now log in.');
       })
       .catch((err) => {
         console.error('Registration error:', err);
@@ -223,6 +223,7 @@ export default function App() {
                 : (
                   <Register
                     onRegister={handleRegister}
+
                   />
                 )
             }

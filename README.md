@@ -33,7 +33,7 @@ Notes
 - In production, set env vars via your host/PM2/process manager (avoid `.env` files).
 - If your `MONGODB_URI` already includes a database in the path, the app will still use `DB_NAME` (default `aroundb`).
 
-Frontend (optional) `frontend/.env`:
+Frontend `frontend/.env`:
 ```
 # Use only if not relying on the dev proxy
 VITE_API_BASE_URL=http://localhost:3001
@@ -78,6 +78,8 @@ cd backend
 npm start
 ```
 
+
+
 PM2 example config: `backend/ecosystem.config.js`.
 
 Reverse proxy (example Nginx)
@@ -104,7 +106,7 @@ server {
 
 CORS
 - In `backend/app.js`, allowed origins include:
-  - `https://www.luizhondo.com`, `https://luizhondo.com`, and `http://localhost:3000`
+  - `http://localhost:3000`
 - Adjust this list for your deployment domains as needed.
 
 ## API Summary

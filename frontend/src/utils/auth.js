@@ -1,5 +1,5 @@
 // Prefer env var; fallback to '/api' for production behind Nginx
-const BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api';
+const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 export const register = (email, password) => {
   return fetch(`${BASE_URL}/signup`, {

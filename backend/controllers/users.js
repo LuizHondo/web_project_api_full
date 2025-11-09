@@ -1,11 +1,11 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import User from '../models/user.js';
-import { logger } from '../middleware/logger.js';
-import UnauthorizedError from '../errors/UnauthorizedError.js';
-import BadRequestError from '../errors/BadRequestError.js';
-import NotFoundError from '../errors/NotFoundError.js';
-import ConflictError from '../errors/ConflictError.js';
+import User from '../models/user';
+import { logger } from '../middleware/logger';
+import UnauthorizedError from '../errors/UnauthorizedError';
+import BadRequestError from '../errors/BadRequestError';
+import NotFoundError from '../errors/NotFoundError';
+import ConflictError from '../errors/ConflictError';
 
 export const login = async (req, res, next) => {
   try {
@@ -60,6 +60,7 @@ export const getCurrentUser = async (req, res, next) => {
     logger.error(`Error in getCurrentUser: ${err.message}`);
     next(err);
   }
+  return null;
 };
 
 export const getUserById = async (req, res, next) => {
@@ -78,11 +79,14 @@ export const getUserById = async (req, res, next) => {
     logger.error(`Error in getUserById: ${err.message}`);
     next(err);
   }
+  return null;
 };
 
 export const createUser = async (req, res, next) => {
   try {
-    const { name, about, avatar, email, password } = req.body;
+    const {
+      name, about, avatar, email, password,
+    } = req.body;
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       logger.warn(`Attempt to create user with duplicate email: ${email}`);
@@ -113,6 +117,7 @@ export const createUser = async (req, res, next) => {
     logger.error(`Error creating user: ${err.message}`);
     next(err);
   }
+  return null;
 };
 
 export const updateUser = async (req, res, next) => {
@@ -136,6 +141,7 @@ export const updateUser = async (req, res, next) => {
     logger.error(`Error updating user: ${err.message}`);
     next(err);
   }
+  return null;
 };
 
 export const updateUserAvatar = async (req, res, next) => {
@@ -159,4 +165,5 @@ export const updateUserAvatar = async (req, res, next) => {
     logger.error(`Error updating avatar: ${err.message}`);
     next(err);
   }
+  return null;
 };
